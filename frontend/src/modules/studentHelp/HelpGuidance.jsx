@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Building2, LifeBuoy, MapPin } from 'lucide-react'
+import PortalMark from '../../components/PortalMark'
+import TabCard from '../../components/TabCard'
 import { getErrorMessage, getServices } from '../../services/api'
 
 // What to do when stuck (the same advice for every student)
@@ -10,7 +12,7 @@ const whenStuck = [
   'Still stuck? Go to the Student Help Desk with a screenshot of the problem.',
 ]
 
-// "If you are stuck" advice + the list of university services (from the database).
+// "If you are stuck" advice + every portal and office (from the database).
 export default function HelpGuidance() {
   const [services, setServices] = useState([])
   const [error, setError] = useState('')
@@ -30,38 +32,51 @@ export default function HelpGuidance() {
   }, [])
 
   return (
-    <aside className="space-y-8">
-      <section className="rounded-xl border border-line bg-surface p-6">
-        <h2 className="text-lg font-bold">If you are stuck</h2>
-        <ol className="mt-4 space-y-3">
+    <aside className="space-y-12">
+      <TabCard title="If you are stuck" icon={LifeBuoy}>
+        <ol className="space-y-3 px-5 pb-5">
           {whenStuck.map((advice, index) => (
             <li key={advice} className="flex gap-3">
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-bold text-paper">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-flame text-sm font-bold text-white">
                 {index + 1}
               </span>
               {advice}
             </li>
           ))}
         </ol>
-      </section>
+      </TabCard>
 
-      <section>
-        <h2 className="text-lg font-bold">Where to go for what</h2>
-        {error && <p role="alert" className="mt-3 text-vermilion-deep">{error}</p>}
-        <ul className="mt-4 space-y-3">
+      <TabCard title="Where to go for what" icon={MapPin}>
+        {error && <p role="alert" className="px-5 pb-4 text-danger">{error}</p>}
+        <ul className="divide-y divide-line">
           {services.map((service) => (
-            <li key={service._id} className="rounded-xl border border-line bg-surface px-5 py-4">
-              <p className="font-semibold text-ink">{service.name}</p>
-              <p className="mt-0.5 text-sm text-stone-deep">{service.description}</p>
-              {service.url && (
-                <a href={service.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-ink underline">
-                  Open <ArrowUpRight className="size-3.5" aria-hidden="true" />
-                </a>
+            <li key={service._id} className="flex items-start gap-3 px-5 py-3.5">
+              {service.isPortal ? (
+                <PortalMark portal={service} size="sm" />
+              ) : (
+                <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-paper text-muted ring-1 ring-line ring-inset">
+                  <Building2 className="size-4" />
+                </span>
               )}
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-ink">{service.name}</p>
+                <p className="text-sm text-muted">{service.description}</p>
+                {service.url && (
+                  <a
+                    href={service.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-blue hover:underline"
+                  >
+                    Open {service.name} <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                    <span className="sr-only">(new tab)</span>
+                  </a>
+                )}
+              </div>
             </li>
           ))}
         </ul>
-      </section>
+      </TabCard>
     </aside>
   )
 }

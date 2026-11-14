@@ -1,43 +1,50 @@
-import { NavLink } from 'react-router-dom'
-import { LifeBuoy, ListChecks } from 'lucide-react'
-import logo from '../assets/logo.svg'
+import { Link, useLocation } from 'react-router-dom'
+import { AppWindow, LayoutGrid, LifeBuoy } from 'lucide-react'
 
 const links = [
-  { to: '/', label: 'All tasks', icon: ListChecks },
-  { to: '/help', label: 'Help & FAQs', icon: LifeBuoy },
+  { to: '/', label: 'Tasks', icon: LayoutGrid },
+  { to: '/portals', label: 'Portals', icon: AppWindow },
+  { to: '/help', label: 'Help', icon: LifeBuoy },
 ]
 
-// Main navigation. A left panel on laptops, a top bar on phones.
+// Main navigation, like the orange UMS side menu: icon on top, name below.
+// A left column on laptops, a bar at the bottom of the screen on phones.
 export default function Sidebar() {
-  return (
-    <aside className="flex items-center bg-ink text-paper md:sticky md:top-0 md:h-screen md:w-60 md:shrink-0 md:flex-col md:items-stretch">
-      <div className="flex items-center gap-3 px-4 py-3 md:px-5 md:py-6">
-        <img src={logo} alt="" className="size-8" />
-        <span className="text-lg font-bold">LPU-Uni-Path</span>
-      </div>
+  const { pathname } = useLocation()
 
-      <nav className="ml-auto flex gap-1 px-2 md:ml-0 md:flex-col md:px-3">
-        {links.map(({ to, label, icon: Icon }) => (
-          <NavLink
+  // "Tasks" stays highlighted on a task's own pages (/tasks/...)
+  function isActive(to) {
+    if (to === '/') return pathname === '/' || pathname.startsWith('/tasks')
+    return pathname.startsWith(to)
+  }
+
+  return (
+    <nav
+      aria-label="Main"
+      className="fixed inset-x-0 bottom-0 z-30 flex border-t border-black/10 bg-apricot md:sticky md:top-[72px] md:h-[calc(100vh-72px)] md:w-[104px] md:shrink-0 md:flex-col md:border-t-0"
+    >
+      {links.map(({ to, label, icon: Icon }) => {
+        const active = isActive(to)
+        return (
+          <Link
             key={to}
             to={to}
-            end={to === '/'}
-            aria-label={label}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] ${
-                isActive ? 'bg-ink-soft font-semibold text-paper' : 'text-ink-mist hover:bg-ink-soft hover:text-paper'
-              }`
-            }
+            aria-current={active ? 'page' : undefined}
+            className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-[13px] font-semibold text-ink md:flex-none md:gap-2 md:border-b md:border-black/10 md:py-6 ${
+              active
+                ? 'bg-white/45 before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-flame md:before:inset-y-0 md:before:right-auto md:before:h-auto md:before:w-1.5'
+                : 'hover:bg-white/25'
+            }`}
           >
-            <Icon className="size-5" aria-hidden="true" />
-            <span className="hidden sm:inline">{label}</span>
-          </NavLink>
-        ))}
-      </nav>
+            <Icon className="size-6 md:size-7" strokeWidth={1.6} aria-hidden="true" />
+            {label}
+          </Link>
+        )
+      })}
 
-      <p className="mt-auto hidden p-5 text-sm leading-relaxed text-ink-mist md:block">
-        One university. Many portals. One simple guide.
+      <p className="mt-auto hidden px-3 pb-6 text-center text-[11px] leading-snug text-ink/75 md:block">
+        Guide only. Work happens on the official portals.
       </p>
-    </aside>
+    </nav>
   )
 }

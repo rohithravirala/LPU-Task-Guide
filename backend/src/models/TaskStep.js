@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { defineModel } from '../lib/defineModel.js';
 
 // One step of a task's journey. `order` decides the sequence (1, 2, 3 ...).
 // `service` says which university service the student uses in this step.
@@ -18,4 +19,4 @@ const taskStepSchema = new mongoose.Schema(
 // Steps are always fetched by task and sorted by order, so index exactly that.
 taskStepSchema.index({ task: 1, order: 1 });
 
-export default mongoose.models.TaskStep || mongoose.model('TaskStep', taskStepSchema);
+export default defineModel('TaskStep', taskStepSchema);

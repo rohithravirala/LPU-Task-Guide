@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { defineModel } from '../lib/defineModel.js';
 
 // A frequently asked question. `task` is optional: when set, the FAQ is also
 // shown at the bottom of that task's journey page.
@@ -13,4 +14,4 @@ const faqSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.models.FAQ || mongoose.model('FAQ', faqSchema);
+export default defineModel('FAQ', faqSchema);

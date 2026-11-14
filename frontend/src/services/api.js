@@ -67,10 +67,16 @@ export async function login(registrationNumber, password) {
   return response.data.data // { token, student }
 }
 
-// Module 1 – Task Catalogue
+// Module 1 – Task Catalogue (public: works without logging in)
 export async function getTasks(search = '') {
   const response = await api.get('/tasks', { params: { search } })
-  return response.data.data // { tasks, categories }
+  return response.data.data // { tasks, categories, portals }
+}
+
+// Module 1 – "Your updates" (sample data, only for the demo account)
+export async function getUpdates() {
+  const response = await api.get('/updates')
+  return response.data.data // { isDemo, updates }
 }
 
 // Module 2 – Task Journey Engine

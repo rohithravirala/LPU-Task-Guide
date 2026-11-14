@@ -14,7 +14,7 @@ export async function connectDB() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(process.env.MONGODB_URI, {
-      dbName: process.env.MONGODB_DB_NAME || 'Lpu-Uni-Path', // database inside the Atlas cluster
+      dbName: process.env.MONGODB_DB_NAME || 'lpuTaskGuide', // database inside the Atlas cluster
     });
   }
 

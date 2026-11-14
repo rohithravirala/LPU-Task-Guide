@@ -11,7 +11,12 @@ function createToken(student) {
 
 // The student details the frontend is allowed to see (never the password hash).
 function publicStudent(student) {
-  return { name: student.name, registrationNumber: student.registrationNumber, program: student.program };
+  return {
+    name: student.name,
+    registrationNumber: student.registrationNumber,
+    program: student.program,
+    isDemo: Boolean(student.isDemo),
+  };
 }
 
 function badRequest(message, status = 400) {

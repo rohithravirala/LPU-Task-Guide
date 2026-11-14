@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
+import { openUrlFor } from '@/lib/openUrl';
 import { getStudentId, unauthorized } from '@/middleware/authMiddleware';
 import Task from '@/models/Task';
 import TaskStep from '@/models/TaskStep';
-import '@/models/UniversityService'; // registers the model used by populate('service')
+import '@/models/UniversityService'; // registers the model used by populate('portal') and populate('service')
 
 // MODULE 2 – Task Journey Engine
 // GET /api/journeys/:taskId  ->  the task + its steps in order, each with its university service
@@ -17,15 +18,30 @@ export async function getJourney(request, taskId) {
 
   try {
     await connectDB();
-    const task = await Task.findOne({ _id: taskId, isActive: true }).lean();
+    // populate() replaces an id with the full document it points to
+    const [task, steps] = await Promise.all([
+      Task.findOne({ _id: taskId, isActive: true }).populate('portal').lean(),
+      TaskStep.find({ task: taskId }).sort({ order: 1 }).populate('service').lean(),
+    ]);
     if (!task) {
       return NextResponse.json({ success: false, message: 'Task not found' }, { status: 404 });
     }
 
-    // populate('service') replaces the service id with the full service document
-    const steps = await TaskStep.find({ task: taskId }).sort({ order: 1 }).populate('service').lean();
+    const taskOpenUrl = openUrlFor(task);
+    const portalId = task.portal ? String(task.portal._id) : null;
 
-    return NextResponse.json({ success: true, message: 'Journey loaded', data: { task, steps } });
+    // Each step's "Open" button: a step on the task's own portal goes to the task's page,
+    // any other step goes to that service's home page (if it has a website at all)
+    const stepsWithLinks = steps.map((step) => ({
+      ...step,
+      openUrl: step.service && String(step.service._id) === portalId ? taskOpenUrl : step.service?.url || '',
+    }));
+
+    return NextResponse.json({
+      success: true,
+      message: 'Journey loaded',
+      data: { task: { ...task, openUrl: taskOpenUrl }, steps: stepsWithLinks },
+    });
   } catch (error) {
     console.error('Could not load journey:', error.message);
     return NextResponse.json({ success: false, message: 'Could not load this journey' }, { status: 500 });

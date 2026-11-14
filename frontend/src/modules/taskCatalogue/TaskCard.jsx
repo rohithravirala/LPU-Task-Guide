@@ -1,41 +1,61 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Clock, ListOrdered, MapPin } from 'lucide-react'
+import { ArrowUpRight, ListOrdered } from 'lucide-react'
+import MenuTrail from '../../components/MenuTrail'
+import PortalMark from '../../components/PortalMark'
 
-// One task. Clicking it opens the task details page.
-export default function TaskCard({ task }) {
-  const places = task.services?.slice(0, 2).join(', ')
+// One task in the list.
+//  - The title and the "Open" button take the student straight to the portal (new tab).
+//  - "Steps" opens our step-by-step guide for the task. On the public task list
+//    (`isPublic`) the guide needs a login, so it goes to Sign in and comes back here.
+export default function TaskCard({ task, isPublic = false }) {
+  const { portal, openUrl } = task
+  const guideLink = isPublic ? `/login?next=${encodeURIComponent(`/tasks/${task._id}`)}` : `/tasks/${task._id}`
 
   return (
-    <Link
-      to={`/tasks/${task._id}`}
-      className="group flex flex-col rounded-xl border border-line bg-surface p-6 transition hover:border-ink hover:shadow-md"
-    >
-      <h3 className="text-lg font-bold">{task.title}</h3>
-      <p className="mt-1.5 text-stone-deep">{task.summary}</p>
+    <li className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-3 px-4 py-4 transition-colors hover:bg-flame-wash/40 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-5">
+      <PortalMark portal={portal} />
 
-      <ul className="mt-4 space-y-1.5 text-sm text-charcoal">
-        <li className="flex items-center gap-2">
-          <ListOrdered className="size-4 text-stone-deep" aria-hidden="true" />
-          {task.stepCount} simple steps
-        </li>
-        {task.estimatedMinutes && (
-          <li className="flex items-center gap-2">
-            <Clock className="size-4 text-stone-deep" aria-hidden="true" />
-            About {task.estimatedMinutes} minutes
-          </li>
+      <div className="min-w-0">
+        {openUrl ? (
+          <a
+            href={openUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-ink decoration-flame/50 underline-offset-4 hover:text-flame-deep hover:underline"
+          >
+            {task.title}
+            <span className="sr-only"> (opens {portal?.name} in a new tab)</span>
+          </a>
+        ) : (
+          <Link to={guideLink} className="font-semibold text-ink underline-offset-4 hover:text-flame-deep hover:underline">
+            {task.title}
+          </Link>
         )}
-        {places && (
-          <li className="flex items-center gap-2">
-            <MapPin className="size-4 text-stone-deep" aria-hidden="true" />
-            You will use: {places}
-          </li>
-        )}
-      </ul>
+        <p className="mt-0.5 text-sm text-muted">{task.summary}</p>
+        <MenuTrail portal={portal} path={task.menuPath} />
+      </div>
 
-      <span className="mt-5 flex items-center gap-1.5 font-semibold text-ink">
-        See the steps
-        <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-      </span>
-    </Link>
+      <div className="col-start-2 flex items-center gap-2 sm:col-start-auto">
+        <Link
+          to={guideLink}
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-line-strong bg-surface px-3 text-sm font-medium text-charcoal hover:border-blue hover:text-blue"
+        >
+          <ListOrdered className="size-4" aria-hidden="true" />
+          Steps<span className="sr-only"> for {task.title}</span>
+        </Link>
+        {openUrl && (
+          <a
+            href={openUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-9 items-center gap-1 rounded-lg bg-flame px-3.5 text-sm font-semibold text-white hover:bg-flame-deep"
+          >
+            Open
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+            <span className="sr-only"> {task.title} on {portal?.name} (new tab)</span>
+          </a>
+        )}
+      </div>
+    </li>
   )
 }

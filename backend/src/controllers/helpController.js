@@ -35,13 +35,13 @@ export async function getFaqs(request) {
   }
 }
 
-// GET /api/services -> every university service (UMS, LPU Touch, offices ...)
+// GET /api/services -> every university service: the portals first (UMS, LPU Live ...), then offices
 export async function getServices(request) {
   if (!getStudentId(request)) return unauthorized();
 
   try {
     await connectDB();
-    const services = await UniversityService.find().sort({ type: 1, name: 1 }).lean();
+    const services = await UniversityService.find().sort({ isPortal: -1, order: 1, type: 1, name: 1 }).lean();
     return NextResponse.json({ success: true, message: `${services.length} services found`, data: services });
   } catch (error) {
     console.error('Could not load services:', error.message);

@@ -1,157 +1,257 @@
-// Sample content for LPU-Uni-Path. Edit this file, then run `npm run seed`.
+// Sample content for LPU Task Guide. Edit this file, then run `npm run seed`.
 //
 // IMPORTANT: these steps are general guidance written for the project. They do not
 // state official university rules, deadlines or fee amounts. Only add an official
-// `url` to a service after checking that it is the correct university link.
+// `url` after checking that it is the correct university link.
+//
+// UMS menu paths are copied from the real UMS menus (Academics, Administrative and
+// Important Links). Menu names can change; update `menuPath` when they do.
+
+/* ------------------------------------------------------------------ */
+/* Portals (where tasks are done) and offices                          */
+/* ------------------------------------------------------------------ */
 
 export const services = [
-  { name: 'UMS', type: 'Portal', description: 'University Management System: the student portal for academic records and requests.', url: '' },
-  { name: 'LPU Touch', type: 'Mobile App', description: 'University mobile app for students.', url: '' },
-  { name: 'LPU Live', type: 'Mobile App', description: 'University communication platform for students.', url: '' },
-  { name: 'Examination Office', type: 'Office', description: 'Handles examination schedules, results and exam-related payments.', url: '' },
-  { name: 'Accounts Office', type: 'Office', description: 'Handles fee payments and payment problems.', url: '' },
-  { name: 'Student Help Desk', type: 'Help Desk', description: 'First place to ask when you do not know which office to contact.', url: '' },
-  { name: 'School / Department Office', type: 'Office', description: 'Your own school or department, for course-specific questions.', url: '' },
-];
-
-// `service` is the name of a service above.
-export const tasks = [
   {
-    title: 'Check your attendance',
-    category: 'Attendance',
-    summary: 'See your course-wise attendance and spot problems early.',
-    description: 'Attendance is published on the student portal. Check it regularly so you notice low attendance or wrong entries while there is still time to fix them.',
-    requirements: ['Your registration number and portal password'],
-    keywords: ['attendance', 'absent', 'present', 'shortage', 'classes'],
-    estimatedMinutes: 5,
-    steps: [
-      { title: 'Log in to UMS', service: 'UMS', instructions: ['Open UMS from an official bookmark, not from a link in a message.', 'Log in with your registration number and password.'] },
-      { title: 'Open the attendance section', service: 'UMS', instructions: ['Find the attendance option in the menu. The exact name can differ.'] },
-      { title: 'Check every course', service: 'UMS', instructions: ['Look at the attendance of each course.', 'Note any course where it looks lower than expected.'] },
-      { title: 'Report a wrong entry', service: 'School / Department Office', isOptional: true, instructions: ['If an entry is wrong, tell your course teacher or department office with the date and course.'], note: 'Do this quickly; old entries are harder to correct.' },
-    ],
+    name: 'UMS',
+    type: 'Portal',
+    isPortal: true,
+    slug: 'ums',
+    shortName: 'UMS',
+    order: 1,
+    description: 'University Management System: attendance, exams, fees, hostel, placements and most official requests.',
+    url: 'https://ums.lpu.in/lpuums/StudentDashboard.aspx',
+    openHint: 'Log in with your registration number and UMS password. Check that the address bar shows ums.lpu.in first.',
+    menuHint: 'The menus (Academics, Administrative, Important Links …) are along the top of UMS.',
   },
   {
+    name: 'LPU Live',
+    type: 'Portal',
+    isPortal: true,
+    slug: 'lpu-live',
+    shortName: 'Live',
+    order: 2,
+    description: 'Official chat platform: your course groups, personal chats with teachers and university announcements.',
+    url: 'https://lpulive.lpu.in',
+    openHint: 'Sign in with your ID and password. Check that the address bar shows lpulive.lpu.in first.',
+    menuHint: 'The icons are in the narrow bar on the left side of LPU Live.',
+  },
+  {
+    name: 'CodeTantra',
+    type: 'Portal',
+    isPortal: true,
+    slug: 'codetantra',
+    shortName: 'CT',
+    order: 3,
+    description: 'MyClass (myclass.lpu.in), powered by CodeTantra: online tests, coding labs and course content.',
+    url: 'https://myclass.lpu.in',
+    openHint: 'Log in with your UMS registration number and password. Check that the address bar shows myclass.lpu.in first.',
+    menuHint: 'The main menu appears after you log in.',
+  },
+  {
+    name: 'NeoColab',
+    type: 'Portal',
+    isPortal: true,
+    slug: 'neocolab',
+    shortName: 'Neo',
+    order: 4,
+    description: 'LPU Colab by iamneo: coding practice, PEP (placement training) exercises and tests.',
+    url: 'https://lpucolab438.examly.io',
+    openHint: 'Log in with the account details your teacher or PEP trainer shared. Check that the address bar shows lpucolab438.examly.io first.',
+  },
+  {
+    name: 'LPU Touch',
+    type: 'Mobile App',
+    isPortal: true,
+    slug: 'lpu-touch',
+    shortName: 'Touch',
+    order: 5,
+    description: 'UMS on your phone: attendance, CA marks, placement profile and more.',
+    url: 'https://play.google.com/store/apps/details?id=ums.lovely.university',
+    alternateUrl: 'https://apps.apple.com/app/id509819753',
+    alternateLabel: 'App Store (iPhone)',
+    openHint: 'Open the LPU Touch app on your phone. Not installed? Get it from the Play Store or App Store, then log in with your UMS registration number and password.',
+    menuHint: 'Menu names in the app can differ a little from UMS; look for the closest match.',
+  },
+  { name: 'Examination Office', type: 'Office', description: 'Handles examination schedules, results and exam-related payments.' },
+  { name: 'Accounts Office', type: 'Office', description: 'Handles fee payments and payment problems.' },
+  { name: 'Student Help Desk', type: 'Help Desk', description: 'First place to ask when you do not know which office to contact.' },
+  { name: 'School / Department Office', type: 'Office', description: 'Your own school or department, for course-specific questions.' },
+];
+
+/* ------------------------------------------------------------------ */
+/* Tasks                                                               */
+/* ------------------------------------------------------------------ */
+//
+// Every task has a `portal` (a portal name above) and, when known, a `menuPath`:
+// where to click inside that portal. The task's "Open" button goes to the portal
+// (or to `url`, when the exact page link has been checked).
+//
+// Steps: write `steps` by hand, OR leave them out and the seed builds them:
+//   1. Open <portal>   2. Go to <menu path>   3. Open "<last menu item>" + `howTo`
+// `extraSteps` are added after the built steps. `howToTitle` replaces the title of
+// step 3, `stepNote` adds a warning to it. A step's `service` is a service name above.
+
+const LOGIN = {
+  UMS: 'Your registration number and UMS password',
+  'LPU Live': 'Your LPU Live ID and password',
+  CodeTantra: 'Your UMS registration number and password',
+  NeoColab: 'Your NeoColab login details',
+  'LPU Touch': 'The LPU Touch app and your UMS login',
+};
+
+// Small helpers so each task says its portal once and gets the login requirement automatically
+function onPortal(portal, menuPath, task) {
+  return { portal, menuPath, ...task, requirements: [LOGIN[portal], ...(task.requirements ?? [])] };
+}
+const ums = (menuPath, task) => onPortal('UMS', menuPath, task);
+const live = (menuPath, task) => onPortal('LPU Live', menuPath, task);
+const codetantra = (menuPath, task) => onPortal('CodeTantra', menuPath, task);
+const neocolab = (menuPath, task) => onPortal('NeoColab', menuPath, task);
+const touch = (menuPath, task) => onPortal('LPU Touch', menuPath, task);
+
+const LMS = ['Academics', 'Learning Management System (LMS)'];
+const EXAMS = ['Academics', 'Examination System'];
+const PLACEMENT = ['Academics', 'Placement Services'];
+const FEES = ['Administrative', 'Fee and Scholarship System'];
+const HOSTEL = ['Administrative', 'Residential Services'];
+const LPU_LIVE_CHAT = 'https://lpulive.lpu.in/chat';
+
+// Exact UMS pages. Only add a page here after checking it: a real UMS page answers a
+// logged-out browser by redirecting to LoginNew.aspx, a wrong name answers 404.
+// When the student is already logged in to UMS, the page opens directly.
+const UMS_PAGE = 'https://ums.lpu.in/lpuums/';
+
+export const tasks = [
+  /* ---------- Attendance & Timetable ---------- */
+  ums([...LMS, 'View Attendance'], {
+    title: 'Check your attendance',
+    category: 'Attendance & Timetable',
+    summary: 'See your course-wise attendance and spot problems early.',
+    description: 'Attendance is published on UMS. Check it regularly so you notice low attendance or wrong entries while there is still time to fix them.',
+    keywords: ['attendance', 'absent', 'present', 'shortage', 'classes'],
+    estimatedMinutes: 5,
+    isPopular: true,
+    howTo: ['Check the attendance of each course.', 'Note any course where it looks lower than expected.'],
+    extraSteps: [
+      { title: 'Report a wrong entry', service: 'School / Department Office', isOptional: true, instructions: ['If an entry is wrong, tell your course teacher or department office with the date and course.'], note: 'Do this quickly; old entries are harder to correct.' },
+    ],
+  }),
+  ums([...LMS, 'View Attendance'], {
     title: 'Understand attendance requirements',
-    category: 'Attendance',
+    category: 'Attendance & Timetable',
     summary: 'Find the official attendance rule that applies to your courses.',
     description: 'Attendance rules are decided by the university and can differ between programmes. Read the official rule instead of depending on what friends say.',
     requirements: ['Your programme and course list'],
     keywords: ['attendance', 'rule', 'minimum', 'percentage', 'shortage'],
     estimatedMinutes: 10,
     steps: [
-      { title: 'Find the official attendance rule', service: 'LPU Live', instructions: ['Look for the latest official notice or handbook about attendance.'] },
-      { title: 'Compare with your attendance', service: 'UMS', instructions: ['Open your attendance on UMS and compare each course with the rule.'] },
+      { title: 'Find the official attendance rule', service: 'LPU Live', instructions: ['Look for the latest official announcement or handbook about attendance.'] },
+      { title: 'Compare with your attendance', service: 'UMS', instructions: ['In UMS open Academics › Learning Management System (LMS) › View Attendance.', 'Compare each course with the rule.'] },
       { title: 'Ask if anything is unclear', service: 'School / Department Office', isOptional: true, instructions: ['Ask your department office or class coordinator.'] },
     ],
-  },
-  {
+  }),
+  ums([...LMS, 'View Time Table'], {
+    title: 'View your class timetable',
+    category: 'Attendance & Timetable',
+    summary: 'Find your weekly timetable and room numbers.',
+    description: 'Your timetable is on UMS. Check it for rooms and any changes.',
+    keywords: ['timetable', 'time table', 'classes', 'room', 'schedule'],
+    estimatedMinutes: 5,
+    isPopular: true,
+    howTo: ['Note the room and time of each class.'],
+    extraSteps: [
+      { title: 'Check it on your phone', service: 'LPU Touch', isOptional: true, instructions: ['Use LPU Touch for quick checks during the week.'] },
+    ],
+  }),
+  ums([...LMS, 'View MakeUp and Adjustment Details'], {
+    title: 'Check make-up and adjustment classes',
+    category: 'Attendance & Timetable',
+    summary: 'See extra or rescheduled classes so you do not miss them.',
+    keywords: ['makeup', 'make up', 'adjustment', 'extra class', 'rescheduled'],
+    estimatedMinutes: 5,
+    howTo: ['See any make-up, extra or rescheduled classes for your courses.', 'Add them to your own calendar or timetable.'],
+  }),
+  ums(['Important Links', 'Academic Calendar'], {
+    title: 'See the academic calendar',
+    category: 'Attendance & Timetable',
+    summary: 'Term dates, holidays and exam periods for the session.',
+    keywords: ['calendar', 'holiday', 'session', 'term', 'dates', 'vacation'],
+    estimatedMinutes: 5,
+    howTo: ['Note the term start and end dates, holidays and exam periods.'],
+  }),
+  touch(['Attendance'], {
+    title: 'Check attendance on your phone',
+    category: 'Attendance & Timetable',
+    summary: 'A quick attendance check in the LPU Touch app.',
+    keywords: ['attendance', 'mobile', 'app', 'phone'],
+    estimatedMinutes: 2,
+    howTo: ['Open the attendance section and check each course.', 'For a wrong entry, contact your course teacher or department office.'],
+  }),
+
+  /* ---------- Examinations & Results ---------- */
+  ums(['Important Links', 'Date Sheet'], {
     title: 'Find your examination schedule',
-    category: 'Examinations',
+    category: 'Examinations & Results',
     summary: 'Get the official dates, times and rooms for your exams.',
-    description: 'Exam schedules are announced officially and shown on the student portal. Write down every exam and check again for changes.',
-    requirements: ['Your registration number and portal password'],
+    description: 'Exam schedules (date sheets) are published on UMS. Write down every exam and check again for changes.',
     keywords: ['exam', 'datesheet', 'date sheet', 'schedule', 'timetable'],
     estimatedMinutes: 10,
-    steps: [
-      { title: 'Check for the official announcement', service: 'LPU Live', instructions: ['Confirm that the exam schedule has been officially released.'] },
-      { title: 'Open the examination section on UMS', service: 'UMS', instructions: ['Log in to UMS and open the examination section.'] },
-      { title: 'Note every exam', service: 'UMS', instructions: ['Write down the date, time and room of every exam.', 'Make sure all your registered courses are listed.'] },
+    isPopular: true,
+    howTo: ['Write down the date, time and room of every exam.', 'Make sure all your registered courses are listed.'],
+    extraSteps: [
       { title: 'Report a clash or missing exam', service: 'Examination Office', isOptional: true, instructions: ['Contact the Examination Office if two exams clash or a course is missing.'] },
     ],
-  },
-  {
+  }),
+  ums([...EXAMS, 'Academic Result'], {
     title: 'Check your examination results',
-    category: 'Examinations',
+    category: 'Examinations & Results',
     summary: 'See your results and know what to do if something is wrong.',
-    description: 'After results are declared they are shown on the student portal. Check every course carefully.',
-    requirements: ['Your registration number and portal password'],
+    description: 'After results are declared they are shown on UMS. Check every course carefully.',
     keywords: ['result', 'marks', 'grade', 'cgpa', 'sgpa'],
     estimatedMinutes: 10,
-    steps: [
-      { title: 'Open results on UMS', service: 'UMS', instructions: ['Log in to UMS and open the results section.'] },
-      { title: 'Check every course', service: 'UMS', instructions: ['Check the result of each course and note any problem.'] },
+    isPopular: true,
+    howTo: ['Check the result of each course and note any problem.'],
+    extraSteps: [
       { title: 'Report a mistake', service: 'Examination Office', isOptional: true, instructions: ['Follow the process given in the official notice to report a mistake.'] },
     ],
-  },
-  {
+  }),
+  touch(['Marks'], {
+    title: 'See your CA marks on your phone',
+    category: 'Examinations & Results',
+    summary: 'Check continuous assessment (CA) marks in LPU Touch.',
+    keywords: ['ca', 'marks', 'continuous assessment', 'mobile', 'app'],
+    estimatedMinutes: 2,
+    howTo: ['Open the marks section and choose the course.', 'If a mark looks wrong, ask your course teacher.'],
+  }),
+  ums([...FEES, 'Fee Dashboard'], {
     title: 'Pay an examination fine',
-    category: 'Examinations',
+    category: 'Examinations & Results',
     summary: 'Find the fine, pay it through the official system and keep proof.',
-    description: 'If you have an examination fine, the amount and reason are shown in your student account. Always pay through the official system, never through links sent in messages.',
-    requirements: ['Your registration number and portal password', 'An accepted payment method'],
+    description: 'If you have an examination fine, the amount and reason are shown in your UMS account. Always pay through the official system, never through links sent in messages.',
+    requirements: ['An accepted payment method'],
     keywords: ['fine', 'penalty', 'exam fine', 'dues', 'payment', 'pay'],
     estimatedMinutes: 15,
     steps: [
-      { title: 'Find the fine on UMS', service: 'UMS', instructions: ['Log in to UMS and open the fees or dues section.', 'Note the amount and the reason for the fine.'] },
+      { title: 'Find the fine on UMS', service: 'UMS', instructions: ['Log in to UMS and open Administrative › Fee and Scholarship System › Fee Dashboard.', 'Note the amount and the reason for the fine.'] },
       { title: 'Check the reason', service: 'Examination Office', isOptional: true, instructions: ['If you think the fine is wrong, ask the Examination Office before paying.'] },
       { title: 'Pay through the official payment option', service: 'UMS', instructions: ['Use the payment option inside UMS.', 'Wait for the confirmation screen; do not close the page.'], note: 'Never pay through links or QR codes sent on WhatsApp or SMS.' },
       { title: 'Save the receipt', service: 'UMS', instructions: ['Download or screenshot the receipt and note the transaction number.'] },
       { title: 'Check that the fine is cleared', service: 'Accounts Office', instructions: ['Check UMS again after some time.', 'If it still shows, contact the Accounts Office with your transaction number.'] },
     ],
-  },
-  {
-    title: 'Pay your university fees',
-    category: 'Finance and Payments',
-    summary: 'Check the amount due, pay officially and keep the receipt.',
-    description: 'Fee details are shown in your student account. Confirm the amount there and pay only through the official payment option.',
-    requirements: ['Your registration number and portal password', 'An accepted payment method'],
-    keywords: ['fee', 'fees', 'payment', 'pay', 'tuition', 'receipt'],
-    estimatedMinutes: 15,
-    steps: [
-      { title: 'Check the amount due', service: 'UMS', instructions: ['Log in to UMS and open the fee section.', 'Note the amount and any due date shown.'] },
-      { title: 'Pay through the official option', service: 'UMS', instructions: ['Use the payment option inside UMS and wait for confirmation.'] },
-      { title: 'Save the receipt', service: 'UMS', instructions: ['Save the receipt and transaction number.'] },
-      { title: 'Contact Accounts if not updated', service: 'Accounts Office', isOptional: true, instructions: ['If the payment does not show after some time, contact the Accounts Office with your transaction number.'] },
-    ],
-  },
-  {
-    title: 'View your class timetable',
-    category: 'Academics',
-    summary: 'Find your weekly timetable and room numbers.',
-    description: 'Your timetable is available on the student portal and app. Check it for rooms and any changes.',
-    requirements: ['Your registration number and portal password'],
-    keywords: ['timetable', 'time table', 'classes', 'room', 'schedule'],
-    estimatedMinutes: 5,
-    steps: [
-      { title: 'Open the timetable', service: 'UMS', instructions: ['Log in to UMS and open the timetable section.'] },
-      { title: 'Note rooms and timings', service: 'UMS', instructions: ['Note the room and time of each class.'] },
-      { title: 'Check for changes on the app', service: 'LPU Touch', isOptional: true, instructions: ['Use the app for quick checks during the week.'] },
-    ],
-  },
-  {
-    title: 'Register for courses or electives',
-    category: 'Academics',
-    summary: 'Choose and register your courses in the official window.',
-    description: 'Course registration happens during an officially announced period. Plan your choices first, then register on the portal.',
-    requirements: ['Your registration number and portal password', 'Your programme course requirements'],
-    keywords: ['registration', 'course', 'elective', 'subject', 'enroll'],
-    estimatedMinutes: 30,
-    steps: [
-      { title: 'Check the registration window', service: 'LPU Live', instructions: ['Find the official notice with the registration dates.'] },
-      { title: 'Plan your choices', service: 'School / Department Office', instructions: ['Check your programme requirements and ask your advisor if unsure.'] },
-      { title: 'Register on UMS', service: 'UMS', instructions: ['Select your courses on UMS and submit.'] },
-      { title: 'Verify the final list', service: 'UMS', instructions: ['Open your registered courses and check that everything was saved.'] },
-    ],
-  },
-  {
-    title: 'Apply for leave',
-    category: 'Academic Requests',
-    summary: 'Apply for medical, duty or personal leave the right way.',
-    description: 'A correctly submitted leave request keeps your records accurate. Check which leave type applies and what documents are needed.',
-    requirements: ['Dates of absence', 'Supporting documents if needed (for example a medical certificate)'],
-    keywords: ['leave', 'absent', 'medical', 'sick', 'duty leave', 'od'],
-    estimatedMinutes: 15,
-    steps: [
-      { title: 'Choose the type of leave', service: 'School / Department Office', instructions: ['Decide if it is medical, duty or personal leave and read the official rule for it.'] },
-      { title: 'Prepare documents', instructions: ['Keep any required proof ready, such as a medical certificate.'] },
-      { title: 'Submit the application', service: 'UMS', instructions: ['Apply through UMS or your department, as the rule says, and attach documents.'] },
-      { title: 'Track the approval', service: 'UMS', instructions: ['Check the status and keep a copy of the approval.'] },
-    ],
-  },
-  {
+  }),
+  ums([...EXAMS, 'Registration for ReAppear'], {
+    title: 'Register for a re-appear exam',
+    category: 'Examinations & Results',
+    summary: 'Register to take an exam again for a course you need to clear.',
+    keywords: ['reappear', 're-appear', 'backlog', 'supplementary', 'fail'],
+    estimatedMinutes: 10,
+    howTo: ['Select the course(s) you want to re-appear in and submit.', 'Pay the fee if one is shown, and save the confirmation.'],
+    stepNote: 'Missed the normal window? Look for “Registration for ReAppear (Late Fee)” in the same section.',
+  }),
+  ums([...EXAMS, 'Registration for Re-Evaluation'], {
     title: 'Request re-evaluation of an answer script',
-    category: 'Academic Requests',
+    category: 'Examinations & Results',
     summary: 'Check if re-evaluation is offered and apply on time.',
     description: 'Re-evaluation, when offered, has an official window and process. Read the notice carefully before applying.',
     requirements: ['Your result details', 'The official notice about re-evaluation'],
@@ -159,64 +259,550 @@ export const tasks = [
     estimatedMinutes: 20,
     steps: [
       { title: 'Read the official notice', service: 'LPU Live', instructions: ['Check whether re-evaluation is offered, the window and any charges.'] },
-      { title: 'Apply through the official channel', service: 'UMS', instructions: ['Submit the request as the notice explains and save the acknowledgement.'] },
+      { title: 'Apply on UMS', service: 'UMS', instructions: ['Open Academics › Examination System › Registration for Re-Evaluation.', 'Submit the request and save the acknowledgement.'] },
       { title: 'Follow up on the result', service: 'Examination Office', instructions: ['Check for the outcome and contact the Examination Office if it is delayed.'] },
     ],
-  },
-  {
+  }),
+
+  /* ---------- Assignments & Courses ---------- */
+  ums([...LMS, 'Assignment Upload'], {
+    title: 'Upload an assignment',
+    category: 'Assignments & Courses',
+    summary: 'Submit your assignment file before the deadline.',
+    requirements: ['Your assignment file in the format your teacher asked for'],
+    keywords: ['assignment', 'upload', 'submit', 'homework', 'lms'],
+    estimatedMinutes: 10,
+    isPopular: true,
+    howTo: ['Choose the course and the assignment.', 'Attach your file and submit.', 'Check that it shows as submitted.'],
+    stepNote: 'Do not wait for the last hour; uploads can be slow near a deadline.',
+  }),
+  ums([...LMS, 'Assignment Download'], {
+    title: 'Download an assignment question',
+    category: 'Assignments & Courses',
+    summary: 'Get the assignment your teacher has posted.',
+    keywords: ['assignment', 'download', 'question', 'lms'],
+    estimatedMinutes: 5,
+    howTo: ['Choose the course and download the assignment file.', 'Note the last date to submit.'],
+  }),
+  ums([...LMS, 'View Academic Course Syllabus'], {
+    title: 'See a course syllabus',
+    category: 'Assignments & Courses',
+    summary: 'Units, topics and books for any of your courses.',
+    url: `${UMS_PAGE}frmAcademicSyllabusReport.aspx`, // checked 2026-11-14
+    keywords: ['syllabus', 'course', 'topics', 'units', 'books'],
+    estimatedMinutes: 5,
+    howTo: ['Choose the course to see its syllabus.'],
+  }),
+  ums([...LMS, 'View Instruction Plans'], {
+    title: 'See the lecture plan of a course',
+    category: 'Assignments & Courses',
+    summary: 'Which topic is taught in which lecture (instruction plan).',
+    keywords: ['instruction plan', 'lecture plan', 'topics', 'course'],
+    estimatedMinutes: 5,
+    howTo: ['Choose the course to see its lecture-by-lecture plan.'],
+  }),
+  ums([...LMS, 'View Lab Manuals'], {
+    title: 'Download a lab manual',
+    category: 'Assignments & Courses',
+    summary: 'Get the manual for your practical / lab course.',
+    keywords: ['lab', 'manual', 'practical', 'experiment'],
+    estimatedMinutes: 5,
+    howTo: ['Choose the lab course and download its manual.'],
+  }),
+  ums([...LMS, 'View Program Scheme'], {
+    title: 'See your programme scheme',
+    category: 'Assignments & Courses',
+    summary: 'All the courses of your programme, semester by semester.',
+    keywords: ['program scheme', 'programme', 'scheme', 'courses', 'credits', 'semester'],
+    estimatedMinutes: 5,
+    howTo: ['Check the courses and credits for each semester.'],
+  }),
+  ums(['Academics', 'Polling', 'Elective Specialization Polling'], {
+    title: 'Register for courses or electives',
+    category: 'Assignments & Courses',
+    summary: 'Choose your electives or specialization in the official window.',
+    description: 'Elective and specialization choices are made during an officially announced period. Plan your choices first, then submit them on UMS.',
+    requirements: ['Your programme course requirements'],
+    keywords: ['registration', 'course', 'elective', 'specialization', 'polling', 'subject'],
+    estimatedMinutes: 30,
+    steps: [
+      { title: 'Check the registration window', service: 'LPU Live', instructions: ['Find the official announcement with the dates.'] },
+      { title: 'Plan your choices', service: 'School / Department Office', instructions: ['Check your programme requirements and ask your advisor if unsure.'] },
+      { title: 'Submit your choice on UMS', service: 'UMS', instructions: ['Open Academics › Polling › Elective Specialization Polling.', 'Select your choices and submit.'] },
+      { title: 'Verify what was saved', service: 'UMS', instructions: ['Open the same page again and check that your choice was saved.'] },
+    ],
+  }),
+
+  /* ---------- Coding Practice & Tests ---------- */
+  codetantra(['Test'], {
+    title: 'Take a CodeTantra test',
+    category: 'Coding Practice & Tests',
+    summary: 'Find your CA, mid-term or practical test on MyClass and submit it.',
+    requirements: ['A laptop with the CodeTantra app set up and checked a day before'],
+    keywords: ['codetantra', 'test', 'exam', 'myclass', 'coding', 'ca', 'practical', 'mte'],
+    estimatedMinutes: 60,
+    isPopular: true,
+    howTo: ['Find your test by its name and time in the list.', 'Start it when its status allows.', 'Press Submit before time runs out.'],
+    stepNote: 'There is no auto-submit: code that is not submitted is not checked.',
+  }),
+  codetantra([], {
+    title: 'Set up the CodeTantra app before a test',
+    category: 'Coding Practice & Tests',
+    summary: 'Install and check the CodeTantra app a day before your test.',
+    keywords: ['codetantra', 'sea', 'app', 'install', 'setup', 'myclass'],
+    estimatedMinutes: 15,
+    howToTitle: 'Install the CodeTantra app and test it',
+    howTo: [
+      'Look for the download link of the CodeTantra app (SEA) inside MyClass.',
+      'Install it on your laptop (Windows, Mac or Linux) and log in once.',
+      'Do this at least a day before your test so there is time to fix problems.',
+    ],
+  }),
+  codetantra([], {
+    title: 'Practise coding on CodeTantra',
+    category: 'Coding Practice & Tests',
+    summary: 'Work through the coding questions of your course.',
+    keywords: ['codetantra', 'practice', 'coding', 'lab', 'myclass', 'course'],
+    estimatedMinutes: 30,
+    howToTitle: 'Open your course and practise',
+    howTo: ['Open your course from the list.', 'Solve the coding questions and run your code against the test cases.', 'Submit each answer when you are done.'],
+  }),
+  neocolab([], {
+    title: 'Solve your NeoColab practice questions',
+    category: 'Coding Practice & Tests',
+    summary: 'PEP and DSA coding practice set by your trainer.',
+    keywords: ['neocolab', 'colab', 'iamneo', 'pep', 'dsa', 'practice', 'coding'],
+    estimatedMinutes: 30,
+    isPopular: true,
+    howToTitle: 'Open your course and solve the questions',
+    howTo: ['Open the course your teacher or PEP trainer added you to.', 'Solve the coding questions and run them against the test cases.', 'Submit before the deadline shown on the question.'],
+  }),
+  neocolab([], {
+    title: 'Attempt a NeoColab test',
+    category: 'Coding Practice & Tests',
+    summary: 'Take a timed test from your NeoColab course.',
+    keywords: ['neocolab', 'colab', 'iamneo', 'test', 'pep', 'exam'],
+    estimatedMinutes: 60,
+    howToTitle: 'Start the test from your course',
+    howTo: ['Find the test in your course and check its time window.', 'Start only when you are ready: tests usually have a timer.', 'Submit before time runs out.'],
+  }),
+  neocolab([], {
+    title: 'Check your NeoColab scores',
+    category: 'Coding Practice & Tests',
+    summary: 'See your test scores and course progress.',
+    keywords: ['neocolab', 'score', 'result', 'progress', 'pep'],
+    estimatedMinutes: 5,
+    howToTitle: 'Check your results',
+    howTo: ['Open the completed test or course to see your score and progress.', 'Ask your trainer if a score looks wrong.'],
+  }),
+
+  /* ---------- Fees & Scholarships ---------- */
+  ums([...FEES, 'Fee Dashboard'], {
+    title: 'Pay your university fees',
+    category: 'Fees & Scholarships',
+    summary: 'Check the amount due, pay officially and keep the receipt.',
+    description: 'Fee details are on the UMS Fee Dashboard. Confirm the amount there and pay only through the official payment option.',
+    requirements: ['An accepted payment method'],
+    keywords: ['fee', 'fees', 'payment', 'pay', 'tuition', 'dues'],
+    estimatedMinutes: 15,
+    isPopular: true,
+    steps: [
+      { title: 'Check the amount due', service: 'UMS', instructions: ['Log in to UMS and open Administrative › Fee and Scholarship System › Fee Dashboard.', 'Note the amount and any due date shown.'] },
+      { title: 'Pay through the official option', service: 'UMS', instructions: ['Use the payment option inside UMS and wait for confirmation.'], note: 'Never pay through links or QR codes sent on WhatsApp or SMS.' },
+      { title: 'Save the receipt', service: 'UMS', instructions: ['Open View Fee Receipts in the same menu and save the receipt.'] },
+      { title: 'Contact Accounts if not updated', service: 'Accounts Office', isOptional: true, instructions: ['If the payment does not show after some time, contact the Accounts Office with your transaction number.'] },
+    ],
+  }),
+  ums([...FEES, 'View Fee Receipts'], {
+    title: 'Download a fee receipt',
+    category: 'Fees & Scholarships',
+    summary: 'Get the receipt of a fee you have already paid.',
+    keywords: ['receipt', 'fee', 'payment', 'proof', 'download'],
+    estimatedMinutes: 5,
+    howTo: ['Find the payment and download or print its receipt.'],
+  }),
+  ums([...FEES, 'Apply and Download Fee related Certificates (Tuition Fee, Demand Letter etc)'], {
+    title: 'Get a fee certificate or demand letter',
+    category: 'Fees & Scholarships',
+    summary: 'Tuition fee certificate or demand letter for a bank, loan or reimbursement.',
+    keywords: ['fee certificate', 'demand letter', 'tuition', 'bank', 'loan', 'reimbursement'],
+    estimatedMinutes: 10,
+    howTo: ['Choose the certificate you need and apply.', 'Download it when it is ready.'],
+  }),
+  ums([...FEES, 'Scholarship Continuation Request'], {
+    title: 'Request scholarship continuation',
+    category: 'Fees & Scholarships',
+    summary: 'Keep your scholarship for the next term.',
+    keywords: ['scholarship', 'continuation', 'renew', 'continue'],
+    estimatedMinutes: 10,
+    howTo: ['Fill in the request and submit it.', 'Check the rules under Scholarship Policies in the same menu if you are unsure.'],
+  }),
+  ums([...FEES, 'Apply for Fee Refund/Reimbursement'], {
+    title: 'Apply for a fee refund',
+    category: 'Fees & Scholarships',
+    summary: 'Ask for a refund or reimbursement of a fee.',
+    requirements: ['Payment receipt and transaction number'],
+    keywords: ['refund', 'reimbursement', 'fee', 'money back'],
+    estimatedMinutes: 15,
+    howTo: ['Fill in the details of the payment and the reason.', 'Submit and note the request number.'],
+  }),
+  ums([...FEES, 'Bank Loan Document Submission'], {
+    title: 'Submit bank loan documents',
+    category: 'Fees & Scholarships',
+    summary: 'Upload your education loan documents.',
+    requirements: ['Scanned loan documents from your bank'],
+    keywords: ['bank', 'loan', 'education loan', 'documents'],
+    estimatedMinutes: 15,
+    howTo: ['Upload the documents your bank gave you and submit.'],
+  }),
+
+  /* ---------- Hostel & Campus Life ---------- */
+  ums([...HOSTEL, 'Hostel Booking'], {
+    title: 'Book a hostel room',
+    category: 'Hostel & Campus Life',
+    summary: 'Book your hostel for the term when booking opens.',
+    keywords: ['hostel', 'room', 'booking', 'accommodation', 'residence'],
+    estimatedMinutes: 15,
+    howTo: ['Choose the hostel and room type from the options shown.', 'Pay if asked, and save the confirmation.'],
+    stepNote: 'Hostel Booking is also a button under Important Links on the UMS dashboard.',
+  }),
+  ums([...HOSTEL, 'Hostel Leave Application'], {
+    title: 'Apply for hostel leave',
+    category: 'Leave & Applications',
+    summary: 'Get permission before you leave the hostel overnight.',
+    url: `${UMS_PAGE}frmStudentHostelLeaveApplicationTermWise.aspx`, // checked 2026-11-14
+    keywords: ['hostel', 'leave', 'home', 'outing', 'night out', 'leave slip'],
+    estimatedMinutes: 10,
+    isPopular: true,
+    howTo: ['Fill in the dates and reason and submit.', 'After approval, open “Hostel Leave Slip” in the same section and keep it with you.'],
+  }),
+  ums([...HOSTEL, 'Hostel Mutual Shifting'], {
+    title: 'Swap rooms with another student',
+    category: 'Hostel & Campus Life',
+    summary: 'Request a mutual room shift when both of you agree.',
+    keywords: ['hostel', 'room change', 'shift', 'swap', 'mutual'],
+    estimatedMinutes: 10,
+    howTo: ['Enter the details of the student you want to swap with and submit.'],
+  }),
+  ums([...HOSTEL, 'Electricity Consumption View'], {
+    title: 'Check your hostel electricity usage',
+    category: 'Hostel & Campus Life',
+    summary: 'See how much electricity your room has used.',
+    keywords: ['electricity', 'power', 'units', 'consumption', 'hostel'],
+    estimatedMinutes: 2,
+    howTo: ['Check the usage shown for your room.'],
+  }),
+  ums([...HOSTEL, 'House Keeping Rating'], {
+    title: 'Rate hostel housekeeping',
+    category: 'Hostel & Campus Life',
+    summary: 'Give feedback on room and hostel cleaning.',
+    keywords: ['housekeeping', 'cleaning', 'rating', 'feedback', 'hostel'],
+    estimatedMinutes: 2,
+    howTo: ['Give your rating and submit.'],
+  }),
+  ums(['Administrative', 'Security and Safety', 'Sponsored Parent Pass Request'], {
+    title: 'Request a campus pass for your parents',
+    category: 'Hostel & Campus Life',
+    summary: 'Get an entry pass before your parents visit.',
+    keywords: ['parent', 'pass', 'visitor', 'gate', 'entry'],
+    estimatedMinutes: 10,
+    howTo: ['Fill in the visit details and submit before the visit.'],
+  }),
+  ums(['Important Links', 'Issued Books'], {
+    title: 'See books issued to you',
+    category: 'Hostel & Campus Life',
+    summary: 'Library books you have, and when to return them.',
+    keywords: ['library', 'books', 'issued', 'return', 'due date'],
+    estimatedMinutes: 2,
+    howTo: ['Check each book and its return date.'],
+  }),
+  ums(['Important Links', 'Part-time job'], {
+    title: 'Apply for a part-time job on campus',
+    category: 'Hostel & Campus Life',
+    summary: 'Find and apply for part-time work at the university.',
+    keywords: ['part time', 'job', 'work', 'earn'],
+    estimatedMinutes: 10,
+    howTo: ['Look at the openings shown and apply for the one you want.'],
+  }),
+
+  /* ---------- Placements & Internships ---------- */
+  ums([...PLACEMENT, 'Placement Portal'], {
+    title: 'Open the placement portal',
+    category: 'Placements & Internships',
+    summary: 'See placement drives and apply to companies.',
+    keywords: ['placement', 'job', 'company', 'drive', 'campus placement'],
+    estimatedMinutes: 10,
+    isPopular: true,
+    howTo: ['Check the open drives and their eligibility.', 'Apply before the last date shown.'],
+  }),
+  ums([...PLACEMENT, 'Career Services Registration'], {
+    title: 'Register for career services',
+    category: 'Placements & Internships',
+    summary: 'Register to take part in placements.',
+    keywords: ['career services', 'placement', 'registration', 'register'],
+    estimatedMinutes: 10,
+    howTo: ['Fill in the registration and submit.'],
+  }),
+  ums([...PLACEMENT, 'OJT/Internship Application'], {
+    title: 'Apply for OJT or an internship',
+    category: 'Placements & Internships',
+    summary: 'Apply for on-the-job training or an internship.',
+    requirements: ['Internship / company details'],
+    keywords: ['ojt', 'internship', 'training', 'apply'],
+    estimatedMinutes: 15,
+    howTo: ['Fill in the company and internship details and submit.'],
+  }),
+  ums([...PLACEMENT, 'Internship Recommendation Letter'], {
+    title: 'Get an internship recommendation letter',
+    category: 'Placements & Internships',
+    summary: 'A letter from the university for a company that asks for one.',
+    keywords: ['internship', 'recommendation', 'letter', 'noc'],
+    estimatedMinutes: 10,
+    howTo: ['Fill in the company details and submit the request.', 'Download the letter when it is ready.'],
+  }),
+  ums(['Academics', 'Upload Research Project/ Internship Certificate'], {
+    title: 'Upload your internship certificate',
+    category: 'Placements & Internships',
+    summary: 'Submit the certificate after finishing an internship or project.',
+    requirements: ['Your internship / project certificate (scanned)'],
+    keywords: ['internship', 'certificate', 'upload', 'project'],
+    estimatedMinutes: 10,
+    howTo: ['Upload the certificate and submit.'],
+  }),
+  touch(['Placement'], {
+    title: 'View your placement profile on your phone',
+    category: 'Placements & Internships',
+    summary: 'Check your placement profile in LPU Touch.',
+    keywords: ['placement', 'profile', 'mobile', 'app'],
+    estimatedMinutes: 2,
+    howTo: ['Open the placement section to see your profile.'],
+  }),
+
+  /* ---------- Documents & Certificates ---------- */
+  ums(['Important Links', 'Certificate Request'], {
     title: 'Request a bonafide certificate',
-    category: 'Documents and Certificates',
+    category: 'Documents & Certificates',
     summary: 'Get a certificate that confirms you are a current student.',
     description: 'A bonafide certificate is often needed for scholarships, banks or internships. Check the required format first.',
-    requirements: ['Your registration number', 'The purpose of the certificate'],
+    requirements: ['The purpose of the certificate'],
     keywords: ['bonafide', 'certificate', 'document', 'letter', 'proof'],
     estimatedMinutes: 15,
     steps: [
       { title: 'Confirm the format you need', instructions: ['Ask the organisation that wants the certificate if they need a specific format.'] },
-      { title: 'Submit the request', service: 'UMS', instructions: ['Use the document request option on UMS, or ask your department office.'] },
+      { title: 'Submit the request on UMS', service: 'UMS', instructions: ['Open Important Links › Certificate Request on UMS.', 'Choose the certificate and submit.'] },
       { title: 'Collect the certificate', service: 'School / Department Office', instructions: ['Track the request and collect or download the certificate.'] },
     ],
-  },
+  }),
+  ums([...EXAMS, 'Application for Academic Certificate'], {
+    title: 'Apply for an academic certificate',
+    category: 'Documents & Certificates',
+    summary: 'Ask for an official academic certificate.',
+    keywords: ['certificate', 'academic', 'degree', 'document'],
+    estimatedMinutes: 10,
+    howTo: ['Choose the certificate, fill in the details and submit.'],
+  }),
+  ums([...EXAMS, 'Application for Provisional Academic Transcript'], {
+    title: 'Get a provisional transcript',
+    category: 'Documents & Certificates',
+    summary: 'A record of your marks before the final transcript.',
+    keywords: ['transcript', 'provisional', 'marks', 'record'],
+    estimatedMinutes: 10,
+    howTo: ['Fill in the details and submit the request.'],
+  }),
+  ums([...EXAMS, 'Application for Letter of Recommendation'], {
+    title: 'Ask for a letter of recommendation',
+    category: 'Documents & Certificates',
+    summary: 'For higher studies or jobs that need an LOR.',
+    keywords: ['lor', 'recommendation', 'letter', 'higher studies'],
+    estimatedMinutes: 10,
+    howTo: ['Fill in the details and submit the request.'],
+  }),
+  ums(['Administrative', 'My Profile', 'My Virtual ID Card'], {
+    title: 'Show your virtual ID card',
+    category: 'Documents & Certificates',
+    summary: 'Your student ID card on screen.',
+    keywords: ['id card', 'identity', 'virtual id', 'card'],
+    estimatedMinutes: 1,
+    howTo: ['Your virtual ID card opens on screen.'],
+  }),
+
+  /* ---------- Leave & Applications ---------- */
+  ums(['Academics', 'Research and Development', 'Apply for Duty Leave and PVR'], {
+    title: 'Apply for duty leave',
+    category: 'Leave & Applications',
+    summary: 'Get duty leave for official university activities.',
+    description: 'Duty leave covers classes missed for official university activities. A correctly submitted request keeps your attendance accurate. For medical leave, ask your department which form to use.',
+    requirements: ['Dates of absence', 'Proof of the activity, if needed'],
+    keywords: ['leave', 'duty leave', 'dl', 'od', 'absent', 'pvr'],
+    estimatedMinutes: 15,
+    steps: [
+      { title: 'Check that duty leave applies', service: 'School / Department Office', instructions: ['Make sure your activity counts for duty leave, and read the official rule.'] },
+      { title: 'Prepare documents', instructions: ['Keep any required proof ready.'] },
+      { title: 'Submit the application on UMS', service: 'UMS', instructions: ['Open Academics › Research and Development › Apply for Duty Leave and PVR.', 'Fill in the dates, attach documents and submit.'] },
+      { title: 'Track the approval', service: 'UMS', instructions: ['Check the status and keep a copy of the approval.'] },
+    ],
+  }),
+  ums([...EXAMS, 'Application for Term Off'], {
+    title: 'Apply for a term off',
+    category: 'Leave & Applications',
+    summary: 'Take a term (semester) break the official way.',
+    keywords: ['term off', 'semester break', 'gap', 'drop'],
+    estimatedMinutes: 15,
+    howTo: ['Fill in the reason and the term and submit.', 'Talk to your department about how it affects your programme.'],
+  }),
+  ums([...LMS, 'CR Nomination'], {
+    title: 'Nominate yourself as class representative',
+    category: 'Leave & Applications',
+    summary: 'Apply to be the CR of your section.',
+    keywords: ['cr', 'class representative', 'nomination'],
+    estimatedMinutes: 5,
+    howTo: ['Fill in the nomination and submit.'],
+  }),
+
+  /* ---------- Messages & Notices ---------- */
+  live(['University Groups', 'Your course group'], {
+    title: 'Message your course group',
+    category: 'Messages & Notices',
+    summary: 'Read updates from your teacher and talk to your class.',
+    keywords: ['lpu live', 'group', 'class', 'chat', 'teacher', 'message'],
+    estimatedMinutes: 2,
+    isPopular: true,
+    url: LPU_LIVE_CHAT,
+    howToTitle: 'Open your course group',
+    howTo: ['Groups are named section - course code, e.g. “K4P24CS - CSC301”.', 'Read the latest messages from your teacher first.'],
+    stepNote: 'This is an official university platform: keep messages professional.',
+  }),
+  live(['University Groups', 'Personal Chat'], {
+    title: 'Chat with a teacher or classmate',
+    category: 'Messages & Notices',
+    summary: 'Start a one-to-one chat on LPU Live.',
+    keywords: ['lpu live', 'personal chat', 'message', 'teacher', 'dm'],
+    estimatedMinutes: 2,
+    url: LPU_LIVE_CHAT,
+    howTo: ['Search for the person and send your message.'],
+  }),
+  live(['University Groups', 'New Group'], {
+    title: 'Create a study group',
+    category: 'Messages & Notices',
+    summary: 'Make your own group on LPU Live.',
+    keywords: ['lpu live', 'new group', 'study group', 'create'],
+    estimatedMinutes: 3,
+    url: LPU_LIVE_CHAT,
+    howTo: ['Name the group and add members.'],
+  }),
+  live(['University Groups', 'Search across Groups/Chats'], {
+    title: 'Find an old message on LPU Live',
+    category: 'Messages & Notices',
+    summary: 'Search across all your groups and chats.',
+    keywords: ['lpu live', 'search', 'old message', 'find'],
+    estimatedMinutes: 2,
+    url: LPU_LIVE_CHAT,
+    howToTitle: 'Use the search box',
+    howTo: ['Type a word from the message or a group name in “Search across Groups/Chats”.'],
+  }),
+  live(['Announcements (megaphone icon)'], {
+    title: 'Find official university notices',
+    category: 'Messages & Notices',
+    summary: 'Know where official notices are published and how to trust them.',
+    description: 'Important dates and changes are shared through official announcements. Do not depend on forwarded screenshots.',
+    keywords: ['notice', 'announcement', 'circular', 'news', 'update'],
+    estimatedMinutes: 5,
+    howTo: ['Read the latest announcements.'],
+    extraSteps: [
+      { title: 'Check the date and source', instructions: ['Make sure the notice is official and that no newer notice replaces it.'] },
+      { title: 'Act before the deadline', instructions: ['Note what the notice asks you to do and when.'] },
+    ],
+  }),
+  ums(['My Messages'], {
+    title: 'Read messages from your teachers on UMS',
+    category: 'Messages & Notices',
+    summary: 'Messages sent to you by teachers and departments.',
+    keywords: ['messages', 'teacher', 'ums', 'notice', 'my messages'],
+    estimatedMinutes: 2,
+    howToTitle: 'Read “My Messages” on the dashboard',
+    howTo: ['The “My Messages” box is on the UMS dashboard, right after you log in.', 'Click “All Messages” to see older ones.'],
+  }),
+
+  /* ---------- Profile & Help ---------- */
+  ums(['Administrative', 'My Profile', 'Profile Update'], {
+    title: 'Update your profile details',
+    category: 'Profile & Help',
+    summary: 'Change your phone number, address or other details.',
+    keywords: ['profile', 'update', 'phone', 'address', 'details'],
+    estimatedMinutes: 5,
+    howTo: ['Edit the details you want to change and save.'],
+  }),
+  ums(['Important Links', 'Emergency Numbers'], {
+    title: 'Find emergency numbers',
+    category: 'Profile & Help',
+    summary: 'Security, medical and other emergency contacts on campus.',
+    keywords: ['emergency', 'security', 'medical', 'ambulance', 'contact', 'helpline'],
+    estimatedMinutes: 1,
+    howTo: ['Save the numbers you may need in your phone.'],
+  }),
   {
     title: 'Get help from the student help desk',
-    category: 'Student Services',
+    category: 'Profile & Help',
     summary: 'Explain your problem clearly and reach the right help.',
     description: 'When no task guide fits your problem, the Student Help Desk can point you to the right office.',
     requirements: ['A short description of your problem', 'Screenshots or error messages, if any'],
     keywords: ['help', 'help desk', 'problem', 'complaint', 'support', 'contact'],
     estimatedMinutes: 10,
     steps: [
-      { title: 'Describe the problem', instructions: ['Write what you tried to do, which service you used and the exact error.'] },
+      { title: 'Describe the problem', instructions: ['Write what you tried to do, which portal you used and the exact error.'] },
       { title: 'Search the FAQs first', isOptional: true, instructions: ['Check the Help page; your question may already be answered.'] },
       { title: 'Contact the help desk', service: 'Student Help Desk', instructions: ['Share your description and screenshots, and note the reference number.'] },
     ],
   },
-  {
-    title: 'Find official university notices',
-    category: 'University Information',
-    summary: 'Know where official notices are published and how to trust them.',
-    description: 'Important dates and changes are shared through official notices. Do not depend on forwarded screenshots.',
-    requirements: [],
-    keywords: ['notice', 'announcement', 'circular', 'news', 'update'],
-    estimatedMinutes: 5,
-    steps: [
-      { title: 'Open the official channel', service: 'LPU Live', instructions: ['Check notices on the official university channels.'] },
-      { title: 'Check the date and source', instructions: ['Make sure the notice is official and that no newer notice replaces it.'] },
-      { title: 'Act before the deadline', instructions: ['Note what the notice asks you to do and when.'] },
-    ],
-  },
 ];
 
+/* ------------------------------------------------------------------ */
+/* FAQs                                                                */
+/* ------------------------------------------------------------------ */
 // `task` is the title of a task above (optional).
 export const faqs = [
+  { category: 'Portals', question: 'Which portal do I use for what?', answer: 'UMS: attendance, exams, fees, hostel, placements and official requests. LPU Live: your course groups, chats with teachers and announcements. CodeTantra (MyClass): online tests and coding labs. NeoColab: coding practice and PEP tests. LPU Touch: UMS on your phone.', keywords: ['portal', 'ums', 'lpu live', 'codetantra', 'neocolab', 'lpu touch', 'which'] },
+  { category: 'Portals', question: 'Why does “Open” take me to the UMS home page and not the exact page?', answer: 'UMS pages only open after you log in, so we take you to UMS and show the exact menu path, for example Academics › Examination System › Academic Result. Follow that path after logging in.', keywords: ['open', 'link', 'redirect', 'ums', 'menu'] },
+  { category: 'Portals', question: 'The portal asks for my password. Is that safe?', answer: 'Only type your password when the address bar shows the official address: ums.lpu.in, lpulive.lpu.in, myclass.lpu.in or lpucolab438.examly.io. LPU Task Guide itself never asks for your UMS password.', keywords: ['password', 'safe', 'phishing', 'login', 'security'] },
+  { category: 'Portals', question: 'I cannot find the menu item the guide mentions.', answer: 'Menu names can change a little. Look for the closest match in the same menu. If it is really missing, the option may not be open right now, for example outside a registration window.', keywords: ['menu', 'missing', 'find', 'not found'] },
   { category: 'Login', question: 'I cannot log in to UMS. What should I check?', answer: 'Check your registration number, make sure Caps Lock is off and try again. If it still fails, note the exact error message and contact the Student Help Desk.', keywords: ['login', 'password', 'ums', 'sign in'] },
-  { category: 'Login', question: 'Is LPU-Uni-Path the official university portal?', answer: 'No. LPU-Uni-Path only guides you to the right university service. Your actual work (payments, requests) is always done on the official university systems.', keywords: ['official', 'ums'] },
+  { category: 'Login', question: 'Is LPU Task Guide the official university portal?', answer: 'No. LPU Task Guide only guides you to the right university portal. Your actual work (payments, requests, tests) is always done on the official university systems.', keywords: ['official', 'ums'] },
   { category: 'Attendance', question: 'My attendance looks wrong. What should I do?', answer: 'Note the date and course, then contact your course teacher or department office quickly. Old entries are harder to correct.', task: 'Check your attendance', keywords: ['attendance', 'wrong'] },
   { category: 'Examinations', question: 'Two of my exams are at the same time. Who do I contact?', answer: 'Contact the Examination Office with your registration number and both course codes.', task: 'Find your examination schedule', keywords: ['clash', 'exam'] },
   { category: 'Examinations', question: 'I paid my exam fine but it still shows as pending.', answer: 'Payments can take some time to update. If it still shows later, contact the Accounts Office with your transaction number and receipt.', task: 'Pay an examination fine', keywords: ['fine', 'pending', 'payment'] },
   { category: 'Examinations', question: 'I think my exam fine is wrong. Should I pay it?', answer: 'Ask the Examination Office about the reason first. Pay only after you understand it, and always through the official payment option.', task: 'Pay an examination fine', keywords: ['fine', 'wrong'] },
+  { category: 'Coding tests', question: 'My CodeTantra test did not submit. What now?', answer: 'CodeTantra does not submit automatically: code is only checked after you press Submit. If you did submit and it still shows as not submitted, take a screenshot and tell your course teacher immediately.', task: 'Take a CodeTantra test', keywords: ['codetantra', 'submit', 'test'] },
   { category: 'Payments', question: 'Money was deducted but the payment failed.', answer: 'Do not pay again immediately. Save the transaction number and contact the Accounts Office.', task: 'Pay your university fees', keywords: ['payment', 'failed', 'deducted'] },
   { category: 'Payments', question: 'Someone sent me a payment link on WhatsApp. Is it safe?', answer: 'Do not use it. Only pay through the official university system.', keywords: ['payment', 'link', 'scam'] },
   { category: 'Help', question: 'I do not know which office handles my problem.', answer: 'Start with the Student Help Desk. Describe the problem clearly and they will direct you.', task: 'Get help from the student help desk', keywords: ['office', 'help', 'contact'] },
   { category: 'Help', question: 'Does marking a step as done here complete it at the university?', answer: 'No. Marking a step as done only helps you track your own progress. It does not send anything to the university.', keywords: ['progress', 'done', 'journey'] },
+  { category: 'Help', question: 'Are the updates on the demo account real?', answer: 'No. LPU has no public API, so the demo account shows sample updates to explain the idea: with an official API, your real deadlines and messages from UMS, LPU Live, CodeTantra and NeoColab would appear there. The tasks, menu paths and Open links are real.', keywords: ['demo', 'updates', 'api', 'sample', 'real'] },
+];
+
+/* ------------------------------------------------------------------ */
+/* Demo account (for teachers / evaluators)                            */
+/* ------------------------------------------------------------------ */
+// A shared login so anyone can try the app without signing up. Its password is
+// public on purpose (it is shown on the Sign in page): the account can only see
+// the same guidance as everyone else, plus the sample updates below.
+// If you change these, also change frontend/src/lib/demo.js.
+export const demoStudent = {
+  name: 'Demo Student',
+  registrationNumber: '12345678',
+  password: 'Demo@2026',
+  program: 'B.Tech CSE (Demo)',
+};
+
+// SAMPLE "updates" shown only to the demo account. A real version would get these
+// from the portals through an official LPU API. `task` is the title of a task above,
+// `dueInDays` turns into a date counted from today.
+export const demoUpdates = [
+  { kind: 'alert', task: 'Check your attendance', title: 'Attendance below 75% in MTH174', detail: 'Currently 71%. Talk to your course teacher if an entry is wrong.' },
+  { kind: 'deadline', task: 'Upload an assignment', title: 'CSC301 assignment 2', detail: 'Data Structures · upload a PDF on UMS', dueInDays: 2 },
+  { kind: 'deadline', task: 'Take a CodeTantra test', title: 'CA-2 coding test', detail: 'CSE310 Java · 10:00 AM on MyClass', dueInDays: 4 },
+  { kind: 'deadline', task: 'Solve your NeoColab practice questions', title: 'PEP practice set 5', detail: '12 of 20 questions solved', dueInDays: 6 },
+  { kind: 'deadline', task: 'Pay your university fees', title: 'Term fee instalment', detail: 'Check the exact amount on the UMS Fee Dashboard', dueInDays: 16 },
+  { kind: 'update', task: 'Message your course group', title: '3 new messages in K4P24CS - CSC302', detail: 'From your course teacher on LPU Live' },
+  { kind: 'update', task: 'Apply for hostel leave', title: 'Hostel leave request pending', detail: 'Submitted 2 days ago · waiting for approval' },
+  { kind: 'update', task: 'See your CA marks on your phone', title: 'New CA marks published', detail: 'INT306 · see them in LPU Touch' },
 ];
