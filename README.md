@@ -102,6 +102,19 @@ To look around without signing in, open http://localhost:5173/explore.
 The official UMS login cannot be used, because there is no official LPU login API or SSO
 access. The UMS password is **never** asked for or stored.
 
+## Deploy (Vercel)
+Two Vercel projects from this repo:
+
+| Project | Root directory | Address |
+| --- | --- | --- |
+| Backend | `backend` | https://lpu-task-guide-backend.vercel.app (its `/` shows "API is running") |
+| Frontend | `frontend` | https://lpu-task-guide.vercel.app |
+
+- Backend: set the environment variable `JWT_SECRET` in Vercel.
+- Frontend: nothing to set. `frontend/.env.production` makes the app call its own `/api`, and
+  `frontend/vercel.json` forwards `/api/*` to the backend (so no CORS setup is needed) and sends
+  every other address (`/login`, `/explore`, `/tasks/...`) to the app, so refreshing a page works.
+
 ## API
 
 All APIs except login, demo login and the task list need the header `Authorization: Bearer <token>`.
