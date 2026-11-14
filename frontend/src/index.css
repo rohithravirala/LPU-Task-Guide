@@ -1,136 +1,57 @@
 @import "tailwindcss";
 
-/*
- * LPU-Uni-Path design tokens. See docs/design-system.md.
- * Tailwind's default palette is switched off on purpose: only the brand colours below
- * exist, which keeps the interface consistent and avoids generic blue/purple UI.
- */
+/* LPU-Uni-Path colours and font. Tailwind turns each one into classes,
+   e.g. --color-ink -> bg-ink / text-ink / border-ink. */
 @theme {
-  --color-*: initial;
+  --color-*: initial; /* use only our own colours */
   --color-white: #ffffff;
 
-  --color-ink: #173b35;
+  --color-ink: #173b35; /* deep green: sidebar, buttons, headings */
   --color-ink-deep: #0f2925;
   --color-ink-soft: #2e5a51;
-  --color-ink-mist: #b9c6bf; /* secondary text on ink (6.8:1) */
+  --color-ink-mist: #c4d1ca; /* light text on the green sidebar */
 
-  --color-paper: #f4f0e7;
-  --color-paper-deep: #ebe5d8;
-  --color-surface: #fffefa;
+  --color-paper: #f6f3ec; /* page background */
+  --color-surface: #ffffff; /* cards */
 
-  --color-vermilion: #d65a3a;
+  --color-vermilion: #d65a3a; /* "do this now" highlight */
   --color-vermilion-deep: #b4442a;
-  --color-vermilion-dark: #963721;
-  --color-vermilion-wash: #f8e4dc;
+  --color-vermilion-wash: #fbebe5;
 
-  --color-chartreuse: #c5ce75;
-  --color-chartreuse-wash: #eef0d0;
+  --color-chartreuse: #9fb33a; /* progress bar */
+  --color-chartreuse-wash: #f0f4dc; /* "done" backgrounds */
 
-  --color-charcoal: #252823;
-  --color-stone: #77766e;
-  --color-stone-deep: #5f5e57;
-  --color-line: #dcd7cb;
-  --color-line-strong: #c4bcaa;
+  --color-charcoal: #24272a; /* main text */
+  --color-stone-deep: #5c5d58; /* secondary text */
+  --color-line: #e3ded2; /* borders */
+  --color-line-strong: #cbc4b4;
 
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  --shadow-float: 0 18px 40px -18px rgb(23 59 53 / 0.45), 0 2px 6px rgb(23 59 53 / 0.08);
-
-  --animate-station: station-pulse 1.2s ease-in-out infinite;
-
-  @keyframes station-pulse {
-    0%, 100% { opacity: 0.25; }
-    50% { opacity: 1; }
-  }
+  /* One clean, easy-to-read font for the whole app */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 @layer base {
-  /* Tailwind v4 defaults borders to currentColor; use the warm hairline instead. */
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
+  * {
     border-color: var(--color-line);
-  }
-
-  html {
-    -webkit-text-size-adjust: 100%;
-    scroll-padding-top: 5rem;
   }
 
   body {
     background-color: var(--color-paper);
     color: var(--color-charcoal);
     font-family: var(--font-sans);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
 
   h1,
   h2,
-  h3,
-  h4 {
-    font-family: var(--font-display);
+  h3 {
     color: var(--color-ink);
-    letter-spacing: -0.015em;
-    text-wrap: balance;
-  }
-
-  p {
-    text-wrap: pretty;
-  }
-
-  ::selection {
-    background-color: var(--color-chartreuse);
-    color: var(--color-ink);
+    line-height: 1.25;
   }
 
   :focus-visible {
     outline: 2px solid var(--color-vermilion);
     outline-offset: 2px;
   }
-
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-}
-
-/* Compact upper-case monospace label: section indices, codes, metadata keys. */
-@utility label-mono {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  line-height: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* Tabular monospace numbers for step identifiers and counts. */
-@utility num-mono {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Faint survey-grid background used behind route diagrams. */
-@utility bg-survey {
-  background-image:
-    linear-gradient(to right, rgb(23 59 53 / 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(23 59 53 / 0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
 }

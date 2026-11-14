@@ -1,29 +1,22 @@
-import User from '../models/User.js';
-import { getAuthCookieName, verifyAuthToken } from '../lib/jwt.js';
+import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
 
-const OBJECT_ID = /^[a-f\d]{24}$/i;
+// The frontend sends the login token in a header:  Authorization: Bearer <token>
+// This returns the student's id from a valid token, or null if the token is
+// missing, wrong or expired.
+export function getStudentId(request) {
+  const header = request.headers.get('authorization') || '';
+  if (!header.startsWith('Bearer ')) return null;
 
-/**
- * Resolves the signed-in user from the httpOnly auth cookie.
- * Returns the User document, or null for guests / invalid or expired tokens.
- *
- * The user is re-read from the database on every request so that deleted accounts
- * and role changes take effect immediately.
- */
-export async function authenticate(request) {
-  const token = request.cookies?.get(getAuthCookieName())?.value;
-  if (!token) return null;
-
-  const payload = verifyAuthToken(token);
-  if (!payload || typeof payload.sub !== 'string' || !OBJECT_ID.test(payload.sub)) return null;
-
-  return User.findById(payload.sub).select('name email role registrationNumber createdAt');
+  try {
+    const payload = jwt.verify(header.slice(7), process.env.JWT_SECRET);
+    return payload.studentId;
+  } catch {
+    return null;
+  }
 }
 
-export function isAdmin(user) {
-  return user?.role === 'admin';
-}
-
-export function isStudent(user) {
-  return user?.role === 'student';
+// Standard answer when a protected API is called without a valid login.
+export function unauthorized() {
+  return NextResponse.json({ success: false, message: 'Please log in again' }, { status: 401 });
 }

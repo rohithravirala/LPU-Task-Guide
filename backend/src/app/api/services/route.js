@@ -1,4 +1,6 @@
-import { apiHandler } from '@/lib/apiHandler';
-import * as serviceController from '@/controllers/serviceController';
+import { getServices } from '@/controllers/helpController';
 
-export const GET = apiHandler(serviceController.getServices, { auth: 'optional' });
+// GET /api/services
+export async function GET(request) {
+  return getServices(request);
+}

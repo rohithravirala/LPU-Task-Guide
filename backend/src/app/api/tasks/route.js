@@ -1,6 +1,6 @@
-import { apiHandler } from '@/lib/apiHandler';
-import * as taskController from '@/controllers/taskController';
+import { getTasks } from '@/controllers/taskController';
 
-// Public read (admins may request inactive tasks); only admins can create.
-export const GET = apiHandler(taskController.getTasks, { auth: 'optional' });
-export const POST = apiHandler(taskController.createTask, { roles: ['admin'] });
+// GET /api/tasks
+export async function GET(request) {
+  return getTasks(request);
+}

@@ -1,140 +1,81 @@
-/**
- * Development seed. Loads SAMPLE categories, services and tasks (all marked
- * "unverified") and creates the admin / demo-student accounts from .env.local.
- *
- *   npm run seed              seeds only when the catalogue is empty
- *   npm run seed -- --reset   replaces ALL categories, services, tasks, steps and task views
- *
- * Note: this script runs in plain Node (not through Next.js), so every module it
- * imports uses relative paths with explicit .js extensions.
- */
-import './loadEnv.js'; // must stay first: loads .env.local before anything reads it
+// Fills MongoDB with the sample content from seedData.js and creates the demo student.
+// Run it with:  npm run seed
+// It REPLACES tasks, steps, services and FAQs every time (edit seedData.js, run again).
+// Other students are never deleted.
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
-import { connectDB, describeDatabaseError, disconnectDB, isDatabaseConnectionError } from '../lib/mongodb.js';
-import User from '../models/User.js';
-import Category from '../models/Category.js';
-import Service from '../models/Service.js';
+import mongoose from 'mongoose';
+import { connectDB } from '../lib/mongodb.js';
+import Student from '../models/Student.js';
 import Task from '../models/Task.js';
 import TaskStep from '../models/TaskStep.js';
-import TaskView from '../models/TaskView.js';
-import { slugify } from '../utils/slugify.js';
-import { categories } from './data/categories.js';
-import { services } from './data/services.js';
-import { tasks } from './data/tasks.js';
+import UniversityService from '../models/UniversityService.js';
+import FAQ from '../models/FAQ.js';
+import { faqs, services, tasks } from './seedData.js';
 
-const shouldReset = process.argv.includes('--reset');
-const MODELS = [User, Category, Service, Task, TaskStep, TaskView];
+// Plain Node does not read .env.local by itself (Next.js does), so load it here.
+const backendFolder = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+dotenv.config({ path: path.join(backendFolder, '.env.local'), quiet: true });
 
-async function seedCatalogue() {
-  const existingTasks = await Task.countDocuments();
-  if (existingTasks > 0 && !shouldReset) {
-    console.log(
-      `• The catalogue already has ${existingTasks} tasks, so it was left unchanged.\n` +
-        '  Run "npm run seed -- --reset" to replace it with the sample content.',
-    );
-    return;
-  }
-
-  if (shouldReset) {
-    await Promise.all([Category, Service, Task, TaskStep, TaskView].map((Model) => Model.deleteMany({})));
-    console.log('• Cleared categories, services, tasks, steps and task views');
-  }
-
-  const categoryDocs = await Category.insertMany(
-    categories.map((category) => ({ ...category, slug: slugify(category.name) })),
-  );
-  const categoryIdByCode = new Map(categoryDocs.map((doc) => [doc.code, doc._id]));
-
-  const serviceDocs = await Service.insertMany(services.map(({ key: _key, ...service }) => service));
-  const serviceIdByKey = new Map(services.map((service, index) => [service.key, serviceDocs[index]._id]));
-
-  const serviceId = (key, context) => {
-    if (!key) return null;
-    const id = serviceIdByKey.get(key);
-    if (!id) throw new Error(`Unknown service key "${key}" in ${context}`);
-    return id;
-  };
-
-  let stepTotal = 0;
-  for (const { category, primaryService, steps, ...task } of tasks) {
-    const categoryId = categoryIdByCode.get(category);
-    if (!categoryId) throw new Error(`Unknown category code "${category}" in task "${task.title}"`);
-
-    const taskDoc = await Task.create({
-      ...task,
-      slug: slugify(task.title),
-      categoryId,
-      primaryServiceId: serviceId(primaryService, `task "${task.title}"`),
-      verificationStatus: 'unverified',
-    });
-
-    await TaskStep.insertMany(
-      steps.map(({ service, ...step }, index) => ({
-        ...step,
-        taskId: taskDoc._id,
-        order: index + 1,
-        serviceId: serviceId(service, `step ${index + 1} of "${task.title}"`),
-      })),
-    );
-    stepTotal += steps.length;
-  }
-
-  console.log(
-    `• Seeded ${categoryDocs.length} categories, ${serviceDocs.length} services, ` +
-      `${tasks.length} tasks and ${stepTotal} steps (all marked "unverified")`,
-  );
-}
-
-async function ensureUser({ label, name, email, password, role }) {
-  if (!email || !password) {
-    console.log(`• Skipped the ${label} account (set its email and password in .env.local)`);
-    return;
-  }
-  if (password.length < 8) throw new Error(`The ${label} password must be at least 8 characters`);
-
-  const existing = await User.findOne({ email: email.toLowerCase() });
-  if (existing) {
-    if (role === 'admin' && existing.role !== 'admin') {
-      existing.role = 'admin';
-      await existing.save();
-      console.log(`• Promoted ${email} to admin`);
-    } else {
-      console.log(`• The ${label} account ${email} already exists (password unchanged)`);
-    }
-    return;
-  }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-  await User.create({ name, email, passwordHash, role });
-  console.log(`• Created the ${label} account: ${email}`);
-}
-
-async function main() {
+async function seed() {
   await connectDB();
-  await Promise.all(MODELS.map((Model) => Model.createIndexes()));
+  console.log(`Connected to database "${mongoose.connection.name}"`);
 
-  await seedCatalogue();
-  await ensureUser({
-    label: 'admin',
-    role: 'admin',
-    name: process.env.SEED_ADMIN_NAME || 'Platform Admin',
-    email: process.env.SEED_ADMIN_EMAIL,
-    password: process.env.SEED_ADMIN_PASSWORD,
-  });
-  await ensureUser({
-    label: 'demo student',
-    role: 'student',
-    name: process.env.SEED_STUDENT_NAME || 'Demo Student',
-    email: process.env.SEED_STUDENT_EMAIL,
-    password: process.env.SEED_STUDENT_PASSWORD,
-  });
+  // 1. Remove old sample content, then make the database indexes match our models
+  //    (syncIndexes also removes indexes left behind by older versions of a model)
+  const contentModels = [Task, TaskStep, UniversityService, FAQ];
+  await Promise.all(contentModels.map((Model) => Model.deleteMany({})));
+  await Promise.all([...contentModels, Student].map((Model) => Model.syncIndexes()));
 
-  console.log('Seed finished.');
+  // 2. Services, then remember each service's _id by its name
+  const savedServices = await UniversityService.insertMany(services);
+  const serviceId = Object.fromEntries(savedServices.map((service) => [service.name, service._id]));
+
+  // 3. Tasks and their ordered steps
+  const taskId = {};
+  let stepCount = 0;
+  for (const { steps, ...taskData } of tasks) {
+    const task = await Task.create(taskData);
+    taskId[task.title] = task._id;
+    const stepDocuments = steps.map((step, index) => ({
+      ...step,
+      task: task._id,
+      order: index + 1,
+      service: step.service ? serviceId[step.service] : undefined,
+    }));
+    await TaskStep.insertMany(stepDocuments);
+    stepCount += steps.length;
+  }
+
+  // 4. FAQs, linked to a task when the FAQ names one
+  await FAQ.insertMany(faqs.map((faq) => ({ ...faq, task: faq.task ? taskId[faq.task] : undefined })));
+
+  // 5. Demo student (password comes from .env.local and is stored only as a hash)
+  const { SEED_STUDENT_NAME, SEED_STUDENT_REG_NO, SEED_STUDENT_PASSWORD } = process.env;
+  if (SEED_STUDENT_REG_NO && SEED_STUDENT_PASSWORD) {
+    await Student.findOneAndUpdate(
+      { registrationNumber: SEED_STUDENT_REG_NO },
+      {
+        name: SEED_STUDENT_NAME || 'Demo Student',
+        registrationNumber: SEED_STUDENT_REG_NO,
+        passwordHash: await bcrypt.hash(SEED_STUDENT_PASSWORD, 10),
+        program: 'B.Tech (Demo)',
+      },
+      { upsert: true },
+    );
+    console.log(`Demo student ready: ${SEED_STUDENT_REG_NO}`);
+  } else {
+    console.log('Skipped demo student: set SEED_STUDENT_REG_NO and SEED_STUDENT_PASSWORD in .env.local');
+  }
+
+  console.log(`Saved ${services.length} services, ${tasks.length} tasks, ${stepCount} steps, ${faqs.length} FAQs`);
 }
 
-main()
+seed()
   .catch((error) => {
-    console.error('Seed failed:', isDatabaseConnectionError(error) ? describeDatabaseError(error) : error.message);
+    console.error('Seed failed:', error.message);
     process.exitCode = 1;
   })
-  .finally(disconnectDB);
+  .finally(() => mongoose.disconnect());

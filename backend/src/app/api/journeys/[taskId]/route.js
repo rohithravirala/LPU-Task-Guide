@@ -1,5 +1,7 @@
-import { apiHandler } from '@/lib/apiHandler';
-import * as journeyController from '@/controllers/journeyController';
+import { getJourney } from '@/controllers/journeyController';
 
-// [taskId] accepts a task id or slug.
-export const GET = apiHandler(journeyController.getJourney, { auth: 'optional' });
+// GET /api/journeys/:taskId   ([taskId] in the folder name is the dynamic part of the URL)
+export async function GET(request, { params }) {
+  const { taskId } = await params;
+  return getJourney(request, taskId);
+}

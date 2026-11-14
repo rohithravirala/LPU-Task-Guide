@@ -1,90 +1,91 @@
 import axios from 'axios'
 
-/**
- * Single axios instance for the whole app.
- * - Sends the httpOnly auth cookie (withCredentials) to the separate API origin.
- * - Normalises every failure into an ApiRequestError with a readable message,
- *   the HTTP status and any field errors returned by the API.
- */
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
-
+// Every call to the backend goes through this one axios instance.
+// VITE_API_URL comes from frontend/.env (e.g. http://localhost:3000/api).
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-  timeout: 15000,
-  headers: { Accept: 'application/json' },
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
 })
 
-export class ApiRequestError extends Error {
-  constructor({ message, status = 0, errors = null }) {
-    super(message)
-    this.name = 'ApiRequestError'
-    this.status = status
-    this.errors = errors
-  }
+// Before every request: attach the login token, so the backend knows who is asking.
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
 
-  get isNotFound() {
-    return this.status === 404
-  }
-
-  get isNetworkError() {
-    return this.status === 0
-  }
-}
-
-let unauthorizedHandler = null
-
-/** AuthContext registers here so an expired session signs the user out everywhere. */
-export function onUnauthorized(handler) {
-  unauthorizedHandler = handler
-  return () => {
-    if (unauthorizedHandler === handler) unauthorizedHandler = null
-  }
-}
-
-function toApiRequestError(error) {
-  const status = error.response?.status ?? 0
-  const body = error.response?.data
-  let message = body?.message
-  if (!message) {
-    message =
-      status === 0
-        ? 'We could not reach the server. Check your connection and that the API is running.'
-        : 'Something went wrong. Please try again.'
-  }
-  return new ApiRequestError({ message, status, errors: body?.errors ?? null })
-}
-
+// After every response: if the backend says 401 (token missing/expired), log out.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (axios.isCancel(error)) return Promise.reject(error)
-    const normalised = toApiRequestError(error)
-    if (normalised.status === 401 && !error.config?.skipAuthRedirect) {
-      unauthorizedHandler?.(normalised)
+    const isAuthRequest = error.config?.url?.includes('/auth/')
+    if (error.response?.status === 401 && !isAuthRequest) {
+      logout()
+      window.location.href = '/login'
     }
-    return Promise.reject(normalised)
+    return Promise.reject(error)
   },
 )
 
-/**
- * Calls the API and returns the response envelope: { success, message, data, meta? }.
- * Pass `skipAuthRedirect` for calls where a 401 is an expected answer (login, /auth/me).
- */
-export async function apiRequest(method, url, { data, params, signal, skipAuthRedirect } = {}) {
-  const response = await api.request({ method, url, data, params, signal, skipAuthRedirect })
-  return response.data
+// Turns any axios error into a message we can show on screen.
+export function getErrorMessage(error) {
+  return error.response?.data?.message || 'Could not reach the server. Is the backend running?'
 }
 
-export function isRequestCancelled(error) {
-  return axios.isCancel(error)
+/* ---------- Login session (stored in the browser) ---------- */
+
+export function saveSession({ token, student }) {
+  localStorage.setItem('token', token)
+  localStorage.setItem('student', JSON.stringify(student))
 }
 
-/** Removes empty values so they are not sent as query parameters. */
-export function cleanParams(params = {}) {
-  return Object.fromEntries(
-    Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== ''),
-  )
+export function getStudent() {
+  try {
+    return JSON.parse(localStorage.getItem('student'))
+  } catch {
+    return null
+  }
 }
 
-export default api
+export function isLoggedIn() {
+  return Boolean(localStorage.getItem('token'))
+}
+
+export function logout() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('student')
+}
+
+/* ---------- API calls (each returns the `data` part of the response) ---------- */
+
+export async function signup({ name, registrationNumber, program, password }) {
+  const response = await api.post('/auth/register', { name, registrationNumber, program, password })
+  return response.data.data // { token, student }
+}
+
+export async function login(registrationNumber, password) {
+  const response = await api.post('/auth/login', { registrationNumber, password })
+  return response.data.data // { token, student }
+}
+
+// Module 1 – Task Catalogue
+export async function getTasks(search = '') {
+  const response = await api.get('/tasks', { params: { search } })
+  return response.data.data // { tasks, categories }
+}
+
+// Module 2 – Task Journey Engine
+export async function getJourney(taskId) {
+  const response = await api.get(`/journeys/${taskId}`)
+  return response.data.data // { task, steps }
+}
+
+// Module 3 – Student Guidance and Help
+export async function getFaqs({ search = '', taskId = '' } = {}) {
+  const response = await api.get('/faqs', { params: { search, taskId } })
+  return response.data.data
+}
+
+export async function getServices() {
+  const response = await api.get('/services')
+  return response.data.data
+}

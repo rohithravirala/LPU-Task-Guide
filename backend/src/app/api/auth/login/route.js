@@ -1,4 +1,6 @@
-import { apiHandler } from '@/lib/apiHandler';
-import * as authController from '@/controllers/authController';
+import { login } from '@/controllers/authController';
 
-export const POST = apiHandler(authController.login);
+// POST /api/auth/login
+export async function POST(request) {
+  return login(request);
+}
