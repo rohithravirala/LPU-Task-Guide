@@ -63,6 +63,12 @@ export async function login(registrationNumber, password) {
   return response.data.data // { token, student }
 }
 
+// "Try demo" button: signs in as the demo account (no password needed in the browser)
+export async function loginAsDemo() {
+  const response = await api.post('/auth/demo')
+  return response.data.data // { token, student }
+}
+
 // Module 1 – Task Catalogue (public: works without logging in)
 export async function getTasks(search = '') {
   const response = await api.get('/tasks', { params: { search } })

@@ -31,10 +31,10 @@ function LoggedInLayout() {
       <div className="md:flex">
         <Sidebar />
         <div className="min-w-0 flex-1 pb-20 md:pb-0">
-          <main className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-10 lg:py-9">
+          <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 lg:px-10 lg:py-9">
             <Outlet />
           </main>
-          <footer className="mx-auto max-w-7xl px-4 pb-8 text-xs text-muted sm:px-6 lg:px-10">
+          <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted sm:px-6 lg:px-10">
             LPU Task Guide is a student guidance project, not an official LPU website. Every task opens on the official portal.
           </footer>
         </div>

@@ -11,7 +11,9 @@ import { getErrorMessage, getTasks } from '../../services/api'
 // The search text and the chosen portal live in the page address (?q=fee&portal=ums),
 // so the Portals page can link straight to one portal's tasks.
 // `isPublic`: the list on /explore, seen without signing in.
-export default function TaskList({ isPublic = false }) {
+// `belowSearch`: shown right under the search box (the dashboard puts "Your updates" there);
+// hidden while searching or filtering, so the results come straight after the search box.
+export default function TaskList({ isPublic = false, belowSearch = null }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q') ?? ''
   const portalSlug = searchParams.get('portal') ?? 'all'
@@ -177,6 +179,8 @@ export default function TaskList({ isPublic = false }) {
 
       {/* The chosen portal, with a button to open it */}
       {activePortal && <PortalBanner portal={activePortal} />}
+
+      {belowSearch && !query && !activePortal && <div className="mt-10">{belowSearch}</div>}
 
       {result.error && !isFirstLoad && (
         <p role="alert" className="mt-6 rounded-xl bg-danger-wash px-4 py-3 text-danger">

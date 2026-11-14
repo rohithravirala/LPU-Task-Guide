@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-import { findStudentByRegistrationNumber } from '@/data/store';
+import { findDemoStudent, findStudentByRegistrationNumber } from '@/data/store';
 
 // Creates the login token. It proves "this student is logged in" and expires after 7 days.
 function createToken(student) {
@@ -46,4 +46,19 @@ export async function login(request) {
     console.error('Login failed:', error.message);
     return badRequest('Login failed. Please try again.', 500);
   }
+}
+
+// POST /api/auth/demo   (no body)
+// The "Try demo" button on the Sign in page: signs in as the demo account
+// (isDemo in src/data/students.js) without typing anything, so testers never see its password.
+// The demo account only sees the same guidance as everyone plus sample updates.
+export async function demoLogin() {
+  const student = findDemoStudent();
+  if (!student) return badRequest('The demo account is not available', 404);
+
+  return NextResponse.json({
+    success: true,
+    message: 'Signed in to the demo account',
+    data: { token: createToken(student), student: publicStudent(student) },
+  });
 }

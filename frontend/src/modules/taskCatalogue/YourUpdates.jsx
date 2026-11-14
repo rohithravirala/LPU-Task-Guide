@@ -19,8 +19,8 @@ function dueText(update) {
   return `Due ${when} · ${format(new Date(update.dueDate), 'EEE, d MMM')}`
 }
 
-// "Your updates": a column on the right of the dashboard, like "My Messages" on the UMS
-// dashboard. Deadlines and messages from every portal, each linked to its task.
+// "Your updates": shown right under the search box on the dashboard, like "My Messages" on the
+// UMS dashboard. Deadlines and messages from every portal as small cards, each linked to its task.
 // SAMPLE data from the backend (LPU has no public API to get a student's real updates).
 export default function YourUpdates() {
   const [state, setState] = useState({ status: 'loading', updates: [], error: '' })
@@ -54,13 +54,13 @@ export default function YourUpdates() {
       {state.status === 'error' && <p role="alert" className="px-4 pb-4 text-sm text-danger">{state.error}</p>}
 
       {state.status === 'ready' && (
-        // The list scrolls on its own, so the column keeps one height
-        <ul className="scroll-area max-h-[340px] divide-y divide-line overflow-y-auto overscroll-contain border-t border-line lg:max-h-[calc(100vh-250px)]">
+        // Cards side by side (3 on laptops, 2 on tablets, 1 on phones); the area scrolls on its own
+        <ul className="scroll-area grid max-h-[360px] gap-3 overflow-y-auto overscroll-contain px-4 pb-4 sm:grid-cols-2 xl:grid-cols-3">
           {state.updates.map((update) => {
             const kind = kindStyles[update.kind] ?? kindStyles.update
             const { task } = update
             return (
-              <li key={update._id} className="flex items-start gap-3 px-4 py-3.5">
+              <li key={update._id} className="flex items-start gap-3 rounded-xl border border-line bg-paper/50 p-3.5">
                 <PortalMark portal={task.portal} size="sm" />
                 <div className="min-w-0 flex-1">
                   <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase ${kind.className}`}>{kind.label}</span>

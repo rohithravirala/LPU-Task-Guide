@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, FlaskConical } from 'lucide-react'
 import AuthLayout from '../components/AuthLayout'
 import { AuthError, PasswordField, TextField } from '../components/AuthInput'
 import { safeNextPath } from '../lib/navigation'
-import { getErrorMessage, isLoggedIn, login, saveSession } from '../services/api'
+import { getErrorMessage, isLoggedIn, login, loginAsDemo, saveSession } from '../services/api'
 
 // Sign in. There is no sign-up: accounts are given out by the project team.
+// "Try demo" signs in as the demo account in one click, for testing.
 export default function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -14,23 +15,27 @@ export default function Login() {
   const [registrationNumber, setRegistrationNumber] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [busy, setBusy] = useState('') // '' | 'password' | 'demo': which button is working
 
   // Already logged in? Go straight on.
   if (isLoggedIn()) return <Navigate to={next} replace />
 
-  async function handleSubmit(event) {
-    event.preventDefault() // stop the browser from reloading the page
+  // Both buttons do the same thing with the answer: keep the session and go on
+  async function signIn(kind, request) {
     setError('')
-    setLoading(true)
+    setBusy(kind)
     try {
-      const data = await login(registrationNumber, password)
-      saveSession(data) // keep the token + student details in the browser
+      saveSession(await request()) // keep the token + student details in the browser
       navigate(next)
     } catch (err) {
       setError(getErrorMessage(err))
-      setLoading(false)
+      setBusy('')
     }
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault() // stop the browser from reloading the page
+    signIn('password', () => login(registrationNumber, password))
   }
 
   return (
@@ -59,14 +64,31 @@ export default function Login() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-flame text-base font-semibold text-white hover:bg-flame-deep disabled:opacity-60"
-        >
-          {loading ? 'Signing in…' : 'Sign in'}
-          {!loading && <ArrowRight className="size-5" aria-hidden="true" />}
-        </button>
+
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={Boolean(busy)}
+            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-flame text-base font-semibold text-white hover:bg-flame-deep disabled:opacity-60"
+          >
+            {busy === 'password' ? 'Signing in…' : 'Sign in'}
+            {busy !== 'password' && <ArrowRight className="size-5" aria-hidden="true" />}
+          </button>
+          {/* Not a form submit: works without typing anything */}
+          <button
+            type="button"
+            onClick={() => signIn('demo', loginAsDemo)}
+            disabled={Boolean(busy)}
+            aria-describedby="try-demo-hint"
+            className="flex h-12 items-center justify-center gap-2 rounded-lg border border-saffron/60 px-4 text-base font-semibold text-apricot hover:border-apricot hover:bg-saffron/10 disabled:opacity-60 sm:px-5"
+          >
+            <FlaskConical className="size-5" aria-hidden="true" />
+            {busy === 'demo' ? 'Opening…' : 'Try demo'}
+          </button>
+        </div>
+        <p id="try-demo-hint" className="-mt-2 text-sm text-fog">
+          <span className="font-semibold text-apricot">Try demo</span> opens a test account with sample data, no login needed.
+        </p>
       </form>
 
       <p className="mt-8 text-center text-sm text-fog">

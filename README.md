@@ -31,9 +31,11 @@ data** (an attendance alert, assignment and test deadlines, a fee instalment, LP
 messages, new CA marks) to show what the app would do with an official API. Each update
 links to its real task. The tasks, menu paths and Open links are real.
 
-**Accounts:** there is no sign-up. Accounts are listed in `backend/src/data/students.js`,
-with only a bcrypt hash of the password. The demo login is shared with evaluators directly,
-not shown on the website.
+**Accounts:** there is no sign-up. `backend/src/data/students.js` has five student accounts
+(registration numbers `12400001` to `12400005`) and the demo account, each with only a
+bcrypt hash of its password. To test the app, press **Try demo** next to
+**Sign in**: it signs in as the demo account (`isDemo: true`) in one click, without showing
+or typing its password.
 
 ### The portals and their links
 | Portal | Link used by "Open" | What it is for |
@@ -58,7 +60,7 @@ without logging in: a real UMS page redirects to `LoginNew.aspx`, a wrong one gi
 The look follows the official LPU portals, so it feels familiar:
 - **Font:** Outfit (the font of LPU Live).
 - **Colours:** LPU orange (`#EA580B` from LPU Live, `#F68121` from UMS), the UMS blue link buttons (`#1779BA`) and the LPU Live dark navy for the sign-in page.
-- **Logo:** the LPU seal (`frontend/src/assets/lpu-seal.svg`), cut as a vector from the logo on lpu.in, so it stays sharp at every size.
+- **Logo:** the LPU seal (`frontend/src/assets/lpu-seal.svg`), cut as a vector from the logo on lpu.in, so it stays sharp at every size. It is also the browser-tab icon (`frontend/public/favicon.svg`, with `favicon-32.png` and `apple-touch-icon.png` for browsers and phones that need PNG).
 - **Layout:** like the UMS dashboard: header with the student's details, an orange side menu, tasks on the left and "Your updates" as a column on the right, cards with an orange label on the top border. Every section scrolls on its own. The sign-in page is an LPU Live-style split card whose left side explains what the app does and which portals it connects.
 
 ## Tech stack
@@ -94,20 +96,21 @@ cp .env.example .env         # VITE_API_URL=http://localhost:3000/api
 npm run dev                  # http://localhost:5173
 ```
 
-Open http://localhost:5173 and sign in with the login you were given. To look around without
-signing in, open http://localhost:5173/explore.
+Open http://localhost:5173 and sign in with the login you were given, or press **Try demo**.
+To look around without signing in, open http://localhost:5173/explore.
 
 The official UMS login cannot be used, because there is no official LPU login API or SSO
 access. The UMS password is **never** asked for or stored.
 
 ## API
 
-All APIs except login and the task list need the header `Authorization: Bearer <token>`.
+All APIs except login, demo login and the task list need the header `Authorization: Bearer <token>`.
 Every response looks like `{ success, message, data }`.
 
 | Method | URL | Module | Returns |
 | --- | --- | --- | --- |
 | POST | `/api/auth/login` | Sign in | `{ token, student }` |
+| POST | `/api/auth/demo` | Try demo | `{ token, student }` for the demo account (no password) |
 | GET | `/api/tasks?search=` | 1 (public) | `{ tasks, categories, portals }` (each task with its portal, menu path, `openUrl`, step count and services used) |
 | GET | `/api/updates` | 1 | `{ updates }`: sample updates, each with its task |
 | GET | `/api/journeys/:taskId` | 2 | `{ task, steps }` (task with its portal and `openUrl`; each step with its service and link) |
@@ -126,7 +129,7 @@ A task id is made from its title, e.g. `apply-for-hostel-leave`.
 | `src/data/store.js` | Builds the data once: ids, steps from menu paths, links between names; stops with a clear error on a typo |
 | `src/lib/openUrl.js` | The link of a task's "Open" button: its exact page, else its portal |
 | `src/middleware/authMiddleware.js` | Reads the token from the request and checks it |
-| `src/controllers/authController.js` | Sign in: checks the password hash and returns a JWT |
+| `src/controllers/authController.js` | Sign in (checks the password hash) and Try demo (the demo account); both return a JWT |
 | `src/controllers/taskController.js` | Task list with search (also by portal name and menu path); adds portal, Open link, step count |
 | `src/controllers/journeyController.js` | One task with its ordered steps; each step gets the right Open link |
 | `src/controllers/helpController.js` | FAQs (search / per task) and university services |
@@ -150,7 +153,7 @@ A task id is made from its title, e.g. `apply-for-hostel-leave`.
 | `components/MenuTrail.jsx` | Where to click: UMS › Academics › Examination System › Academic Result |
 | `lib/portal.js` | Open-button text, address helpers and one icon per category |
 | `lib/navigation.js` | Safe "go back to this page after signing in" address |
-| `pages/Login.jsx` | Sign in: registration number + password |
+| `pages/Login.jsx` | Sign in: registration number + password, and the Try demo button |
 | `pages/Dashboard.jsx` | First page after login: tasks on the left, "Your updates" on the right |
 | `pages/Explore.jsx` | Public task list: every task without signing in |
 | `pages/Portals.jsx` | The five portals: what each is for, official address, Open button, task count |

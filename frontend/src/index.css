@@ -58,6 +58,8 @@
   /* Outfit is the font of LPU Live; the serif is used for its quote */
   --font-sans: "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  /* Montserrat only for the "LPU Task Guide" name: close to the lettering of the LPU logo */
+  --font-brand: "Montserrat", "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {

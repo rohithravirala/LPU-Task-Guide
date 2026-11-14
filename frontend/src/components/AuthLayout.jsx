@@ -60,7 +60,7 @@ export default function AuthLayout({ title, subtitle, children }) {
         >
           <div className="flex items-center gap-3.5">
             <img src={lpuSeal} alt="Lovely Professional University" width="56" height="56" className="size-14 object-contain" />
-            <span className="text-2xl font-bold tracking-tight text-white">LPU TASK GUIDE</span>
+            <span className="font-brand text-[22px] font-extrabold tracking-[0.02em] text-white">LPU TASK GUIDE</span>
           </div>
 
           <div className="mx-auto w-full max-w-md">
@@ -108,7 +108,7 @@ export default function AuthLayout({ title, subtitle, children }) {
           <div className="w-full max-w-md">
             <div className="mb-10 flex items-center gap-3 lg:hidden">
               <img src={lpuSeal} alt="Lovely Professional University" width="44" height="44" className="size-11 object-contain" />
-              <span className="text-xl font-bold tracking-tight text-white">LPU TASK GUIDE</span>
+              <span className="font-brand text-lg font-extrabold tracking-[0.02em] text-white">LPU TASK GUIDE</span>
             </div>
             <h1 className="text-4xl font-bold text-white sm:text-[44px]">{title}</h1>
             <p className="mt-3 text-lg text-fog">{subtitle}</p>

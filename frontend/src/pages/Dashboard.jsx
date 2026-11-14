@@ -2,8 +2,8 @@ import TaskList from '../modules/taskCatalogue/TaskList'
 import YourUpdates from '../modules/taskCatalogue/YourUpdates'
 import { getStudent } from '../services/api'
 
-// First page after login (Module 1 – Task Catalogue), laid out like the UMS dashboard:
-// every task on the left, "Your updates" as a column on the right.
+// First page after login (Module 1 – Task Catalogue):
+// quick links, search, "Your updates" right under the search box, then every task.
 export default function Dashboard() {
   const firstName = getStudent()?.name?.split(' ')[0] ?? 'there'
 
@@ -14,14 +14,8 @@ export default function Dashboard() {
         Every task from UMS, LPU Live, CodeTantra, NeoColab and LPU Touch in one place.
       </p>
 
-      <div className="mt-8 grid items-start gap-x-8 gap-y-10 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0">
-          <TaskList />
-        </div>
-        {/* On phones the updates come first; on laptops they sit on the right and stay in view */}
-        <aside className="order-first pt-4 lg:sticky lg:top-24 lg:order-last">
-          <YourUpdates />
-        </aside>
+      <div className="mt-8">
+        <TaskList belowSearch={<YourUpdates />} />
       </div>
     </div>
   )

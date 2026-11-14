@@ -140,3 +140,8 @@ export function findStudentByRegistrationNumber(registrationNumber) {
 export function findStudentById(id) {
   return students.find((student) => student._id === id) ?? null;
 }
+
+// The account used by the "Try demo" button
+export function findDemoStudent() {
+  return students.find((student) => student.isDemo) ?? null;
+}
