@@ -97,35 +97,35 @@ export default function TaskList({ isPublic = false }) {
 
   if (isFirstLoad && result.error) {
     return (
-      <p role="alert" className="mt-8 rounded-xl bg-danger-wash px-4 py-3 text-danger">
+      <p role="alert" className="rounded-xl bg-danger-wash px-4 py-3 text-danger">
         {result.error}
       </p>
     )
   }
 
   return (
-    <section className="mt-8">
-      {/* Quick links: the most used tasks, like "Important Links" on the UMS dashboard */}
+    <section>
+      {/* Quick links: the most used tasks with short names, like "Important Links" on the UMS dashboard */}
       {quickLinks.length > 0 && (
         <div>
-          <h2 className="flex items-center gap-2 text-xl font-bold">
+          <h2 className="flex items-center gap-2 text-lg font-bold">
             <Zap className="size-5 text-flame" aria-hidden="true" /> Quick links
           </h2>
           {/* One row that scrolls sideways on phones, wrapped lines on bigger screens.
               `relative` keeps the hidden screen-reader text inside the scrolling row. */}
-          <ul className="no-scrollbar relative -mx-4 mt-3 flex gap-2.5 overflow-x-auto border-t border-line px-4 pt-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
+          <ul className="no-scrollbar relative -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
             {quickLinks.map((task) => (
               <li key={task._id} className="shrink-0">
                 <a
                   href={task.openUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-blue py-2 pr-3.5 pl-4 text-sm font-medium whitespace-nowrap text-white shadow-sm shadow-blue/20 hover:bg-blue-deep"
+                  title={`${task.title} (${task.portal.name})`}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-blue px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-white shadow-sm shadow-blue/20 hover:bg-blue-deep"
                 >
-                  {task.title}
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-semibold">{task.portal.name}</span>
+                  {task.shortTitle ?? task.title}
                   <ArrowUpRight className="size-3.5" aria-hidden="true" />
-                  <span className="sr-only">(new tab)</span>
+                  <span className="sr-only">: {task.title} on {task.portal.name} (new tab)</span>
                 </a>
               </li>
             ))}
@@ -134,7 +134,7 @@ export default function TaskList({ isPublic = false }) {
       )}
 
       {/* Search + portal tabs */}
-      <div className={`rounded-2xl border border-line bg-surface p-4 shadow-sm sm:p-5 ${quickLinks.length ? 'mt-10' : ''}`}>
+      <div className={`rounded-2xl border border-line bg-surface p-4 shadow-sm sm:p-5 ${quickLinks.length ? 'mt-6' : ''}`}>
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted" aria-hidden="true" />
           <input
@@ -205,10 +205,11 @@ export default function TaskList({ isPublic = false }) {
         </div>
       )}
 
-      <div className={`mt-12 space-y-12 transition-opacity ${isSearching && !isFirstLoad ? 'opacity-60' : ''}`}>
+      <div className={`mt-10 space-y-10 transition-opacity ${isSearching && !isFirstLoad ? 'opacity-60' : ''}`}>
         {groups.map((group) => (
           <TabCard key={group.category} title={group.category} icon={categoryIcon(group.category)} count={group.tasks.length}>
-            <ul className="divide-y divide-line">
+            {/* Each section scrolls on its own, so a long category does not make the page long */}
+            <ul className="scroll-area max-h-80 divide-y divide-line overflow-y-auto overscroll-contain rounded-b-2xl">
               {group.tasks.map((task) => (
                 <TaskCard key={task._id} task={task} isPublic={isPublic} />
               ))}
@@ -227,7 +228,7 @@ function PortalTab({ label, count, active, onClick }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
         active ? 'border-flame bg-flame text-white' : 'border-line-strong bg-surface text-charcoal hover:border-flame/60 hover:text-flame-deep'
       }`}
     >

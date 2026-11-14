@@ -86,6 +86,12 @@
     outline-offset: 2px;
   }
 
+  /* Sections that scroll on their own (task categories, Your updates): a thin orange scrollbar */
+  .scroll-area {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-apricot) transparent;
+  }
+
   /* Hide the scrollbar of sideways-scrolling rows (portal tabs) on phones */
   .no-scrollbar {
     scrollbar-width: none;

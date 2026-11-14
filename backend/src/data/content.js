@@ -1,4 +1,5 @@
-// Sample content for LPU Task Guide. Edit this file, then run `npm run seed`.
+// All content of LPU Task Guide, hard-coded (there is no database).
+// Edit this file; `npm run dev` reloads it, and store.js checks every name on start.
 //
 // IMPORTANT: these steps are general guidance written for the project. They do not
 // state official university rules, deadlines or fee amounts. Only add an official
@@ -87,7 +88,9 @@ export const services = [
 // where to click inside that portal. The task's "Open" button goes to the portal
 // (or to `url`, when the exact page link has been checked).
 //
-// Steps: write `steps` by hand, OR leave them out and the seed builds them:
+// `isPopular` tasks are shown under Quick links with their short `shortTitle`.
+//
+// Steps: write `steps` by hand, OR leave them out and store.js builds them:
 //   1. Open <portal>   2. Go to <menu path>   3. Open "<last menu item>" + `howTo`
 // `extraSteps` are added after the built steps. `howToTitle` replaces the title of
 // step 3, `stepNote` adds a warning to it. A step's `service` is a service name above.
@@ -132,23 +135,10 @@ export const tasks = [
     keywords: ['attendance', 'absent', 'present', 'shortage', 'classes'],
     estimatedMinutes: 5,
     isPopular: true,
+    shortTitle: 'Attendance',
     howTo: ['Check the attendance of each course.', 'Note any course where it looks lower than expected.'],
     extraSteps: [
       { title: 'Report a wrong entry', service: 'School / Department Office', isOptional: true, instructions: ['If an entry is wrong, tell your course teacher or department office with the date and course.'], note: 'Do this quickly; old entries are harder to correct.' },
-    ],
-  }),
-  ums([...LMS, 'View Attendance'], {
-    title: 'Understand attendance requirements',
-    category: 'Attendance & Timetable',
-    summary: 'Find the official attendance rule that applies to your courses.',
-    description: 'Attendance rules are decided by the university and can differ between programmes. Read the official rule instead of depending on what friends say.',
-    requirements: ['Your programme and course list'],
-    keywords: ['attendance', 'rule', 'minimum', 'percentage', 'shortage'],
-    estimatedMinutes: 10,
-    steps: [
-      { title: 'Find the official attendance rule', service: 'LPU Live', instructions: ['Look for the latest official announcement or handbook about attendance.'] },
-      { title: 'Compare with your attendance', service: 'UMS', instructions: ['In UMS open Academics › Learning Management System (LMS) › View Attendance.', 'Compare each course with the rule.'] },
-      { title: 'Ask if anything is unclear', service: 'School / Department Office', isOptional: true, instructions: ['Ask your department office or class coordinator.'] },
     ],
   }),
   ums([...LMS, 'View Time Table'], {
@@ -159,18 +149,11 @@ export const tasks = [
     keywords: ['timetable', 'time table', 'classes', 'room', 'schedule'],
     estimatedMinutes: 5,
     isPopular: true,
+    shortTitle: 'Timetable',
     howTo: ['Note the room and time of each class.'],
     extraSteps: [
       { title: 'Check it on your phone', service: 'LPU Touch', isOptional: true, instructions: ['Use LPU Touch for quick checks during the week.'] },
     ],
-  }),
-  ums([...LMS, 'View MakeUp and Adjustment Details'], {
-    title: 'Check make-up and adjustment classes',
-    category: 'Attendance & Timetable',
-    summary: 'See extra or rescheduled classes so you do not miss them.',
-    keywords: ['makeup', 'make up', 'adjustment', 'extra class', 'rescheduled'],
-    estimatedMinutes: 5,
-    howTo: ['See any make-up, extra or rescheduled classes for your courses.', 'Add them to your own calendar or timetable.'],
   }),
   ums(['Important Links', 'Academic Calendar'], {
     title: 'See the academic calendar',
@@ -198,6 +181,7 @@ export const tasks = [
     keywords: ['exam', 'datesheet', 'date sheet', 'schedule', 'timetable'],
     estimatedMinutes: 10,
     isPopular: true,
+    shortTitle: 'Date sheet',
     howTo: ['Write down the date, time and room of every exam.', 'Make sure all your registered courses are listed.'],
     extraSteps: [
       { title: 'Report a clash or missing exam', service: 'Examination Office', isOptional: true, instructions: ['Contact the Examination Office if two exams clash or a course is missing.'] },
@@ -211,6 +195,7 @@ export const tasks = [
     keywords: ['result', 'marks', 'grade', 'cgpa', 'sgpa'],
     estimatedMinutes: 10,
     isPopular: true,
+    shortTitle: 'Results',
     howTo: ['Check the result of each course and note any problem.'],
     extraSteps: [
       { title: 'Report a mistake', service: 'Examination Office', isOptional: true, instructions: ['Follow the process given in the official notice to report a mistake.'] },
@@ -240,29 +225,6 @@ export const tasks = [
       { title: 'Check that the fine is cleared', service: 'Accounts Office', instructions: ['Check UMS again after some time.', 'If it still shows, contact the Accounts Office with your transaction number.'] },
     ],
   }),
-  ums([...EXAMS, 'Registration for ReAppear'], {
-    title: 'Register for a re-appear exam',
-    category: 'Examinations & Results',
-    summary: 'Register to take an exam again for a course you need to clear.',
-    keywords: ['reappear', 're-appear', 'backlog', 'supplementary', 'fail'],
-    estimatedMinutes: 10,
-    howTo: ['Select the course(s) you want to re-appear in and submit.', 'Pay the fee if one is shown, and save the confirmation.'],
-    stepNote: 'Missed the normal window? Look for “Registration for ReAppear (Late Fee)” in the same section.',
-  }),
-  ums([...EXAMS, 'Registration for Re-Evaluation'], {
-    title: 'Request re-evaluation of an answer script',
-    category: 'Examinations & Results',
-    summary: 'Check if re-evaluation is offered and apply on time.',
-    description: 'Re-evaluation, when offered, has an official window and process. Read the notice carefully before applying.',
-    requirements: ['Your result details', 'The official notice about re-evaluation'],
-    keywords: ['re-evaluation', 'revaluation', 'recheck', 'marks'],
-    estimatedMinutes: 20,
-    steps: [
-      { title: 'Read the official notice', service: 'LPU Live', instructions: ['Check whether re-evaluation is offered, the window and any charges.'] },
-      { title: 'Apply on UMS', service: 'UMS', instructions: ['Open Academics › Examination System › Registration for Re-Evaluation.', 'Submit the request and save the acknowledgement.'] },
-      { title: 'Follow up on the result', service: 'Examination Office', instructions: ['Check for the outcome and contact the Examination Office if it is delayed.'] },
-    ],
-  }),
 
   /* ---------- Assignments & Courses ---------- */
   ums([...LMS, 'Assignment Upload'], {
@@ -273,16 +235,9 @@ export const tasks = [
     keywords: ['assignment', 'upload', 'submit', 'homework', 'lms'],
     estimatedMinutes: 10,
     isPopular: true,
+    shortTitle: 'Upload assignment',
     howTo: ['Choose the course and the assignment.', 'Attach your file and submit.', 'Check that it shows as submitted.'],
     stepNote: 'Do not wait for the last hour; uploads can be slow near a deadline.',
-  }),
-  ums([...LMS, 'Assignment Download'], {
-    title: 'Download an assignment question',
-    category: 'Assignments & Courses',
-    summary: 'Get the assignment your teacher has posted.',
-    keywords: ['assignment', 'download', 'question', 'lms'],
-    estimatedMinutes: 5,
-    howTo: ['Choose the course and download the assignment file.', 'Note the last date to submit.'],
   }),
   ums([...LMS, 'View Academic Course Syllabus'], {
     title: 'See a course syllabus',
@@ -292,30 +247,6 @@ export const tasks = [
     keywords: ['syllabus', 'course', 'topics', 'units', 'books'],
     estimatedMinutes: 5,
     howTo: ['Choose the course to see its syllabus.'],
-  }),
-  ums([...LMS, 'View Instruction Plans'], {
-    title: 'See the lecture plan of a course',
-    category: 'Assignments & Courses',
-    summary: 'Which topic is taught in which lecture (instruction plan).',
-    keywords: ['instruction plan', 'lecture plan', 'topics', 'course'],
-    estimatedMinutes: 5,
-    howTo: ['Choose the course to see its lecture-by-lecture plan.'],
-  }),
-  ums([...LMS, 'View Lab Manuals'], {
-    title: 'Download a lab manual',
-    category: 'Assignments & Courses',
-    summary: 'Get the manual for your practical / lab course.',
-    keywords: ['lab', 'manual', 'practical', 'experiment'],
-    estimatedMinutes: 5,
-    howTo: ['Choose the lab course and download its manual.'],
-  }),
-  ums([...LMS, 'View Program Scheme'], {
-    title: 'See your programme scheme',
-    category: 'Assignments & Courses',
-    summary: 'All the courses of your programme, semester by semester.',
-    keywords: ['program scheme', 'programme', 'scheme', 'courses', 'credits', 'semester'],
-    estimatedMinutes: 5,
-    howTo: ['Check the courses and credits for each semester.'],
   }),
   ums(['Academics', 'Polling', 'Elective Specialization Polling'], {
     title: 'Register for courses or electives',
@@ -342,6 +273,7 @@ export const tasks = [
     keywords: ['codetantra', 'test', 'exam', 'myclass', 'coding', 'ca', 'practical', 'mte'],
     estimatedMinutes: 60,
     isPopular: true,
+    shortTitle: 'CodeTantra test',
     howTo: ['Find your test by its name and time in the list.', 'Start it when its status allows.', 'Press Submit before time runs out.'],
     stepNote: 'There is no auto-submit: code that is not submitted is not checked.',
   }),
@@ -358,22 +290,12 @@ export const tasks = [
       'Do this at least a day before your test so there is time to fix problems.',
     ],
   }),
-  codetantra([], {
-    title: 'Practise coding on CodeTantra',
-    category: 'Coding Practice & Tests',
-    summary: 'Work through the coding questions of your course.',
-    keywords: ['codetantra', 'practice', 'coding', 'lab', 'myclass', 'course'],
-    estimatedMinutes: 30,
-    howToTitle: 'Open your course and practise',
-    howTo: ['Open your course from the list.', 'Solve the coding questions and run your code against the test cases.', 'Submit each answer when you are done.'],
-  }),
   neocolab([], {
     title: 'Solve your NeoColab practice questions',
     category: 'Coding Practice & Tests',
     summary: 'PEP and DSA coding practice set by your trainer.',
     keywords: ['neocolab', 'colab', 'iamneo', 'pep', 'dsa', 'practice', 'coding'],
     estimatedMinutes: 30,
-    isPopular: true,
     howToTitle: 'Open your course and solve the questions',
     howTo: ['Open the course your teacher or PEP trainer added you to.', 'Solve the coding questions and run them against the test cases.', 'Submit before the deadline shown on the question.'],
   }),
@@ -386,15 +308,6 @@ export const tasks = [
     howToTitle: 'Start the test from your course',
     howTo: ['Find the test in your course and check its time window.', 'Start only when you are ready: tests usually have a timer.', 'Submit before time runs out.'],
   }),
-  neocolab([], {
-    title: 'Check your NeoColab scores',
-    category: 'Coding Practice & Tests',
-    summary: 'See your test scores and course progress.',
-    keywords: ['neocolab', 'score', 'result', 'progress', 'pep'],
-    estimatedMinutes: 5,
-    howToTitle: 'Check your results',
-    howTo: ['Open the completed test or course to see your score and progress.', 'Ask your trainer if a score looks wrong.'],
-  }),
 
   /* ---------- Fees & Scholarships ---------- */
   ums([...FEES, 'Fee Dashboard'], {
@@ -406,6 +319,7 @@ export const tasks = [
     keywords: ['fee', 'fees', 'payment', 'pay', 'tuition', 'dues'],
     estimatedMinutes: 15,
     isPopular: true,
+    shortTitle: 'Pay fees',
     steps: [
       { title: 'Check the amount due', service: 'UMS', instructions: ['Log in to UMS and open Administrative › Fee and Scholarship System › Fee Dashboard.', 'Note the amount and any due date shown.'] },
       { title: 'Pay through the official option', service: 'UMS', instructions: ['Use the payment option inside UMS and wait for confirmation.'], note: 'Never pay through links or QR codes sent on WhatsApp or SMS.' },
@@ -420,40 +334,6 @@ export const tasks = [
     keywords: ['receipt', 'fee', 'payment', 'proof', 'download'],
     estimatedMinutes: 5,
     howTo: ['Find the payment and download or print its receipt.'],
-  }),
-  ums([...FEES, 'Apply and Download Fee related Certificates (Tuition Fee, Demand Letter etc)'], {
-    title: 'Get a fee certificate or demand letter',
-    category: 'Fees & Scholarships',
-    summary: 'Tuition fee certificate or demand letter for a bank, loan or reimbursement.',
-    keywords: ['fee certificate', 'demand letter', 'tuition', 'bank', 'loan', 'reimbursement'],
-    estimatedMinutes: 10,
-    howTo: ['Choose the certificate you need and apply.', 'Download it when it is ready.'],
-  }),
-  ums([...FEES, 'Scholarship Continuation Request'], {
-    title: 'Request scholarship continuation',
-    category: 'Fees & Scholarships',
-    summary: 'Keep your scholarship for the next term.',
-    keywords: ['scholarship', 'continuation', 'renew', 'continue'],
-    estimatedMinutes: 10,
-    howTo: ['Fill in the request and submit it.', 'Check the rules under Scholarship Policies in the same menu if you are unsure.'],
-  }),
-  ums([...FEES, 'Apply for Fee Refund/Reimbursement'], {
-    title: 'Apply for a fee refund',
-    category: 'Fees & Scholarships',
-    summary: 'Ask for a refund or reimbursement of a fee.',
-    requirements: ['Payment receipt and transaction number'],
-    keywords: ['refund', 'reimbursement', 'fee', 'money back'],
-    estimatedMinutes: 15,
-    howTo: ['Fill in the details of the payment and the reason.', 'Submit and note the request number.'],
-  }),
-  ums([...FEES, 'Bank Loan Document Submission'], {
-    title: 'Submit bank loan documents',
-    category: 'Fees & Scholarships',
-    summary: 'Upload your education loan documents.',
-    requirements: ['Scanned loan documents from your bank'],
-    keywords: ['bank', 'loan', 'education loan', 'documents'],
-    estimatedMinutes: 15,
-    howTo: ['Upload the documents your bank gave you and submit.'],
   }),
 
   /* ---------- Hostel & Campus Life ---------- */
@@ -474,39 +354,8 @@ export const tasks = [
     keywords: ['hostel', 'leave', 'home', 'outing', 'night out', 'leave slip'],
     estimatedMinutes: 10,
     isPopular: true,
+    shortTitle: 'Hostel leave',
     howTo: ['Fill in the dates and reason and submit.', 'After approval, open “Hostel Leave Slip” in the same section and keep it with you.'],
-  }),
-  ums([...HOSTEL, 'Hostel Mutual Shifting'], {
-    title: 'Swap rooms with another student',
-    category: 'Hostel & Campus Life',
-    summary: 'Request a mutual room shift when both of you agree.',
-    keywords: ['hostel', 'room change', 'shift', 'swap', 'mutual'],
-    estimatedMinutes: 10,
-    howTo: ['Enter the details of the student you want to swap with and submit.'],
-  }),
-  ums([...HOSTEL, 'Electricity Consumption View'], {
-    title: 'Check your hostel electricity usage',
-    category: 'Hostel & Campus Life',
-    summary: 'See how much electricity your room has used.',
-    keywords: ['electricity', 'power', 'units', 'consumption', 'hostel'],
-    estimatedMinutes: 2,
-    howTo: ['Check the usage shown for your room.'],
-  }),
-  ums([...HOSTEL, 'House Keeping Rating'], {
-    title: 'Rate hostel housekeeping',
-    category: 'Hostel & Campus Life',
-    summary: 'Give feedback on room and hostel cleaning.',
-    keywords: ['housekeeping', 'cleaning', 'rating', 'feedback', 'hostel'],
-    estimatedMinutes: 2,
-    howTo: ['Give your rating and submit.'],
-  }),
-  ums(['Administrative', 'Security and Safety', 'Sponsored Parent Pass Request'], {
-    title: 'Request a campus pass for your parents',
-    category: 'Hostel & Campus Life',
-    summary: 'Get an entry pass before your parents visit.',
-    keywords: ['parent', 'pass', 'visitor', 'gate', 'entry'],
-    estimatedMinutes: 10,
-    howTo: ['Fill in the visit details and submit before the visit.'],
   }),
   ums(['Important Links', 'Issued Books'], {
     title: 'See books issued to you',
@@ -516,14 +365,6 @@ export const tasks = [
     estimatedMinutes: 2,
     howTo: ['Check each book and its return date.'],
   }),
-  ums(['Important Links', 'Part-time job'], {
-    title: 'Apply for a part-time job on campus',
-    category: 'Hostel & Campus Life',
-    summary: 'Find and apply for part-time work at the university.',
-    keywords: ['part time', 'job', 'work', 'earn'],
-    estimatedMinutes: 10,
-    howTo: ['Look at the openings shown and apply for the one you want.'],
-  }),
 
   /* ---------- Placements & Internships ---------- */
   ums([...PLACEMENT, 'Placement Portal'], {
@@ -532,42 +373,7 @@ export const tasks = [
     summary: 'See placement drives and apply to companies.',
     keywords: ['placement', 'job', 'company', 'drive', 'campus placement'],
     estimatedMinutes: 10,
-    isPopular: true,
     howTo: ['Check the open drives and their eligibility.', 'Apply before the last date shown.'],
-  }),
-  ums([...PLACEMENT, 'Career Services Registration'], {
-    title: 'Register for career services',
-    category: 'Placements & Internships',
-    summary: 'Register to take part in placements.',
-    keywords: ['career services', 'placement', 'registration', 'register'],
-    estimatedMinutes: 10,
-    howTo: ['Fill in the registration and submit.'],
-  }),
-  ums([...PLACEMENT, 'OJT/Internship Application'], {
-    title: 'Apply for OJT or an internship',
-    category: 'Placements & Internships',
-    summary: 'Apply for on-the-job training or an internship.',
-    requirements: ['Internship / company details'],
-    keywords: ['ojt', 'internship', 'training', 'apply'],
-    estimatedMinutes: 15,
-    howTo: ['Fill in the company and internship details and submit.'],
-  }),
-  ums([...PLACEMENT, 'Internship Recommendation Letter'], {
-    title: 'Get an internship recommendation letter',
-    category: 'Placements & Internships',
-    summary: 'A letter from the university for a company that asks for one.',
-    keywords: ['internship', 'recommendation', 'letter', 'noc'],
-    estimatedMinutes: 10,
-    howTo: ['Fill in the company details and submit the request.', 'Download the letter when it is ready.'],
-  }),
-  ums(['Academics', 'Upload Research Project/ Internship Certificate'], {
-    title: 'Upload your internship certificate',
-    category: 'Placements & Internships',
-    summary: 'Submit the certificate after finishing an internship or project.',
-    requirements: ['Your internship / project certificate (scanned)'],
-    keywords: ['internship', 'certificate', 'upload', 'project'],
-    estimatedMinutes: 10,
-    howTo: ['Upload the certificate and submit.'],
   }),
   touch(['Placement'], {
     title: 'View your placement profile on your phone',
@@ -592,30 +398,6 @@ export const tasks = [
       { title: 'Submit the request on UMS', service: 'UMS', instructions: ['Open Important Links › Certificate Request on UMS.', 'Choose the certificate and submit.'] },
       { title: 'Collect the certificate', service: 'School / Department Office', instructions: ['Track the request and collect or download the certificate.'] },
     ],
-  }),
-  ums([...EXAMS, 'Application for Academic Certificate'], {
-    title: 'Apply for an academic certificate',
-    category: 'Documents & Certificates',
-    summary: 'Ask for an official academic certificate.',
-    keywords: ['certificate', 'academic', 'degree', 'document'],
-    estimatedMinutes: 10,
-    howTo: ['Choose the certificate, fill in the details and submit.'],
-  }),
-  ums([...EXAMS, 'Application for Provisional Academic Transcript'], {
-    title: 'Get a provisional transcript',
-    category: 'Documents & Certificates',
-    summary: 'A record of your marks before the final transcript.',
-    keywords: ['transcript', 'provisional', 'marks', 'record'],
-    estimatedMinutes: 10,
-    howTo: ['Fill in the details and submit the request.'],
-  }),
-  ums([...EXAMS, 'Application for Letter of Recommendation'], {
-    title: 'Ask for a letter of recommendation',
-    category: 'Documents & Certificates',
-    summary: 'For higher studies or jobs that need an LOR.',
-    keywords: ['lor', 'recommendation', 'letter', 'higher studies'],
-    estimatedMinutes: 10,
-    howTo: ['Fill in the details and submit the request.'],
   }),
   ums(['Administrative', 'My Profile', 'My Virtual ID Card'], {
     title: 'Show your virtual ID card',
@@ -642,22 +424,6 @@ export const tasks = [
       { title: 'Track the approval', service: 'UMS', instructions: ['Check the status and keep a copy of the approval.'] },
     ],
   }),
-  ums([...EXAMS, 'Application for Term Off'], {
-    title: 'Apply for a term off',
-    category: 'Leave & Applications',
-    summary: 'Take a term (semester) break the official way.',
-    keywords: ['term off', 'semester break', 'gap', 'drop'],
-    estimatedMinutes: 15,
-    howTo: ['Fill in the reason and the term and submit.', 'Talk to your department about how it affects your programme.'],
-  }),
-  ums([...LMS, 'CR Nomination'], {
-    title: 'Nominate yourself as class representative',
-    category: 'Leave & Applications',
-    summary: 'Apply to be the CR of your section.',
-    keywords: ['cr', 'class representative', 'nomination'],
-    estimatedMinutes: 5,
-    howTo: ['Fill in the nomination and submit.'],
-  }),
 
   /* ---------- Messages & Notices ---------- */
   live(['University Groups', 'Your course group'], {
@@ -666,7 +432,6 @@ export const tasks = [
     summary: 'Read updates from your teacher and talk to your class.',
     keywords: ['lpu live', 'group', 'class', 'chat', 'teacher', 'message'],
     estimatedMinutes: 2,
-    isPopular: true,
     url: LPU_LIVE_CHAT,
     howToTitle: 'Open your course group',
     howTo: ['Groups are named section - course code, e.g. “K4P24CS - CSC301”.', 'Read the latest messages from your teacher first.'],
@@ -681,25 +446,6 @@ export const tasks = [
     url: LPU_LIVE_CHAT,
     howTo: ['Search for the person and send your message.'],
   }),
-  live(['University Groups', 'New Group'], {
-    title: 'Create a study group',
-    category: 'Messages & Notices',
-    summary: 'Make your own group on LPU Live.',
-    keywords: ['lpu live', 'new group', 'study group', 'create'],
-    estimatedMinutes: 3,
-    url: LPU_LIVE_CHAT,
-    howTo: ['Name the group and add members.'],
-  }),
-  live(['University Groups', 'Search across Groups/Chats'], {
-    title: 'Find an old message on LPU Live',
-    category: 'Messages & Notices',
-    summary: 'Search across all your groups and chats.',
-    keywords: ['lpu live', 'search', 'old message', 'find'],
-    estimatedMinutes: 2,
-    url: LPU_LIVE_CHAT,
-    howToTitle: 'Use the search box',
-    howTo: ['Type a word from the message or a group name in “Search across Groups/Chats”.'],
-  }),
   live(['Announcements (megaphone icon)'], {
     title: 'Find official university notices',
     category: 'Messages & Notices',
@@ -713,25 +459,8 @@ export const tasks = [
       { title: 'Act before the deadline', instructions: ['Note what the notice asks you to do and when.'] },
     ],
   }),
-  ums(['My Messages'], {
-    title: 'Read messages from your teachers on UMS',
-    category: 'Messages & Notices',
-    summary: 'Messages sent to you by teachers and departments.',
-    keywords: ['messages', 'teacher', 'ums', 'notice', 'my messages'],
-    estimatedMinutes: 2,
-    howToTitle: 'Read “My Messages” on the dashboard',
-    howTo: ['The “My Messages” box is on the UMS dashboard, right after you log in.', 'Click “All Messages” to see older ones.'],
-  }),
 
   /* ---------- Profile & Help ---------- */
-  ums(['Administrative', 'My Profile', 'Profile Update'], {
-    title: 'Update your profile details',
-    category: 'Profile & Help',
-    summary: 'Change your phone number, address or other details.',
-    keywords: ['profile', 'update', 'phone', 'address', 'details'],
-    estimatedMinutes: 5,
-    howTo: ['Edit the details you want to change and save.'],
-  }),
   ums(['Important Links', 'Emergency Numbers'], {
     title: 'Find emergency numbers',
     category: 'Profile & Help',
@@ -764,38 +493,23 @@ export const faqs = [
   { category: 'Portals', question: 'Which portal do I use for what?', answer: 'UMS: attendance, exams, fees, hostel, placements and official requests. LPU Live: your course groups, chats with teachers and announcements. CodeTantra (MyClass): online tests and coding labs. NeoColab: coding practice and PEP tests. LPU Touch: UMS on your phone.', keywords: ['portal', 'ums', 'lpu live', 'codetantra', 'neocolab', 'lpu touch', 'which'] },
   { category: 'Portals', question: 'Why does “Open” take me to the UMS home page and not the exact page?', answer: 'UMS pages only open after you log in, so we take you to UMS and show the exact menu path, for example Academics › Examination System › Academic Result. Follow that path after logging in.', keywords: ['open', 'link', 'redirect', 'ums', 'menu'] },
   { category: 'Portals', question: 'The portal asks for my password. Is that safe?', answer: 'Only type your password when the address bar shows the official address: ums.lpu.in, lpulive.lpu.in, myclass.lpu.in or lpucolab438.examly.io. LPU Task Guide itself never asks for your UMS password.', keywords: ['password', 'safe', 'phishing', 'login', 'security'] },
-  { category: 'Portals', question: 'I cannot find the menu item the guide mentions.', answer: 'Menu names can change a little. Look for the closest match in the same menu. If it is really missing, the option may not be open right now, for example outside a registration window.', keywords: ['menu', 'missing', 'find', 'not found'] },
   { category: 'Login', question: 'I cannot log in to UMS. What should I check?', answer: 'Check your registration number, make sure Caps Lock is off and try again. If it still fails, note the exact error message and contact the Student Help Desk.', keywords: ['login', 'password', 'ums', 'sign in'] },
   { category: 'Login', question: 'Is LPU Task Guide the official university portal?', answer: 'No. LPU Task Guide only guides you to the right university portal. Your actual work (payments, requests, tests) is always done on the official university systems.', keywords: ['official', 'ums'] },
   { category: 'Attendance', question: 'My attendance looks wrong. What should I do?', answer: 'Note the date and course, then contact your course teacher or department office quickly. Old entries are harder to correct.', task: 'Check your attendance', keywords: ['attendance', 'wrong'] },
-  { category: 'Examinations', question: 'Two of my exams are at the same time. Who do I contact?', answer: 'Contact the Examination Office with your registration number and both course codes.', task: 'Find your examination schedule', keywords: ['clash', 'exam'] },
   { category: 'Examinations', question: 'I paid my exam fine but it still shows as pending.', answer: 'Payments can take some time to update. If it still shows later, contact the Accounts Office with your transaction number and receipt.', task: 'Pay an examination fine', keywords: ['fine', 'pending', 'payment'] },
-  { category: 'Examinations', question: 'I think my exam fine is wrong. Should I pay it?', answer: 'Ask the Examination Office about the reason first. Pay only after you understand it, and always through the official payment option.', task: 'Pay an examination fine', keywords: ['fine', 'wrong'] },
   { category: 'Coding tests', question: 'My CodeTantra test did not submit. What now?', answer: 'CodeTantra does not submit automatically: code is only checked after you press Submit. If you did submit and it still shows as not submitted, take a screenshot and tell your course teacher immediately.', task: 'Take a CodeTantra test', keywords: ['codetantra', 'submit', 'test'] },
   { category: 'Payments', question: 'Money was deducted but the payment failed.', answer: 'Do not pay again immediately. Save the transaction number and contact the Accounts Office.', task: 'Pay your university fees', keywords: ['payment', 'failed', 'deducted'] },
   { category: 'Payments', question: 'Someone sent me a payment link on WhatsApp. Is it safe?', answer: 'Do not use it. Only pay through the official university system.', keywords: ['payment', 'link', 'scam'] },
-  { category: 'Help', question: 'I do not know which office handles my problem.', answer: 'Start with the Student Help Desk. Describe the problem clearly and they will direct you.', task: 'Get help from the student help desk', keywords: ['office', 'help', 'contact'] },
   { category: 'Help', question: 'Does marking a step as done here complete it at the university?', answer: 'No. Marking a step as done only helps you track your own progress. It does not send anything to the university.', keywords: ['progress', 'done', 'journey'] },
-  { category: 'Help', question: 'Are the updates on the demo account real?', answer: 'No. LPU has no public API, so the demo account shows sample updates to explain the idea: with an official API, your real deadlines and messages from UMS, LPU Live, CodeTantra and NeoColab would appear there. The tasks, menu paths and Open links are real.', keywords: ['demo', 'updates', 'api', 'sample', 'real'] },
+  { category: 'Help', question: 'Are “Your updates” real?', answer: 'No. LPU has no public API, so “Your updates” shows sample data to explain the idea: with an official API, your real deadlines and messages from UMS, LPU Live, CodeTantra and NeoColab would appear there. The tasks, menu paths and Open links are real.', keywords: ['demo', 'updates', 'api', 'sample', 'real'] },
 ];
 
 /* ------------------------------------------------------------------ */
-/* Demo account (for teachers / evaluators)                            */
+/* Sample updates ("Your updates" on the dashboard)                    */
 /* ------------------------------------------------------------------ */
-// A shared login so anyone can try the app without signing up. Its password is
-// public on purpose (it is shown on the Sign in page): the account can only see
-// the same guidance as everyone else, plus the sample updates below.
-// If you change these, also change frontend/src/lib/demo.js.
-export const demoStudent = {
-  name: 'Demo Student',
-  registrationNumber: '12345678',
-  password: 'Demo@2026',
-  program: 'B.Tech CSE (Demo)',
-};
-
-// SAMPLE "updates" shown only to the demo account. A real version would get these
-// from the portals through an official LPU API. `task` is the title of a task above,
-// `dueInDays` turns into a date counted from today.
+// SAMPLE data: a real version would get these from the portals through an official
+// LPU API, which does not exist publicly. `task` is the title of a task above,
+// `dueInDays` turns into a date counted from today, so the dates never go stale.
 export const demoUpdates = [
   { kind: 'alert', task: 'Check your attendance', title: 'Attendance below 75% in MTH174', detail: 'Currently 71%. Talk to your course teacher if an entry is wrong.' },
   { kind: 'deadline', task: 'Upload an assignment', title: 'CSC301 assignment 2', detail: 'Data Structures · upload a PDF on UMS', dueInDays: 2 },
@@ -803,6 +517,5 @@ export const demoUpdates = [
   { kind: 'deadline', task: 'Solve your NeoColab practice questions', title: 'PEP practice set 5', detail: '12 of 20 questions solved', dueInDays: 6 },
   { kind: 'deadline', task: 'Pay your university fees', title: 'Term fee instalment', detail: 'Check the exact amount on the UMS Fee Dashboard', dueInDays: 16 },
   { kind: 'update', task: 'Message your course group', title: '3 new messages in K4P24CS - CSC302', detail: 'From your course teacher on LPU Live' },
-  { kind: 'update', task: 'Apply for hostel leave', title: 'Hostel leave request pending', detail: 'Submitted 2 days ago · waiting for approval' },
   { kind: 'update', task: 'See your CA marks on your phone', title: 'New CA marks published', detail: 'INT306 · see them in LPU Touch' },
 ];

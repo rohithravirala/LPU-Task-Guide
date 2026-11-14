@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight, KeyRound } from 'lucide-react'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import AuthLayout from '../components/AuthLayout'
-import { AuthDivider, AuthError, PasswordField, TextField } from '../components/AuthInput'
-import { DEMO_ACCOUNT } from '../lib/demo'
+import { AuthError, PasswordField, TextField } from '../components/AuthInput'
 import { safeNextPath } from '../lib/navigation'
 import { getErrorMessage, isLoggedIn, login, saveSession } from '../services/api'
 
+// Sign in. There is no sign-up: accounts are given out by the project team.
 export default function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -18,12 +18,6 @@ export default function Login() {
 
   // Already logged in? Go straight on.
   if (isLoggedIn()) return <Navigate to={next} replace />
-
-  function fillDemoAccount() {
-    setRegistrationNumber(DEMO_ACCOUNT.registrationNumber)
-    setPassword(DEMO_ACCOUNT.password)
-    setError('')
-  }
 
   async function handleSubmit(event) {
     event.preventDefault() // stop the browser from reloading the page
@@ -42,27 +36,11 @@ export default function Login() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle={next === '/' ? 'Sign in to see every task from every LPU portal.' : 'Sign in to see the steps for this task.'}
+      subtitle={next === '/' ? 'Sign in to LPU Task Guide.' : 'Sign in to see the steps for this task.'}
     >
-      {/* Demo account for teachers / evaluators */}
-      <div className="mt-8 rounded-xl border border-saffron/40 bg-saffron/10 p-4">
-        <p className="flex items-center gap-2 text-sm font-semibold text-apricot">
-          <KeyRound className="size-4" aria-hidden="true" /> Demo account for evaluation
-        </p>
-        <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-5 gap-y-1 text-sm">
-          <dt className="text-fog">Registration no.</dt>
-          <dd className="font-mono font-semibold text-white">{DEMO_ACCOUNT.registrationNumber}</dd>
-          <dt className="text-fog">Password</dt>
-          <dd className="font-mono font-semibold text-white">{DEMO_ACCOUNT.password}</dd>
-        </dl>
-        <button type="button" onClick={fillDemoAccount} className="mt-3 text-sm font-semibold text-apricot underline underline-offset-4 hover:text-white">
-          Fill in the demo login
-        </button>
-      </div>
-
       <AuthError>{error}</AuthError>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <TextField
           id="registrationNumber"
           label="Registration number"
@@ -91,16 +69,8 @@ export default function Login() {
         </button>
       </form>
 
-      <AuthDivider>New here?</AuthDivider>
-      <Link
-        to={next === '/' ? '/signup' : `/signup?next=${encodeURIComponent(next)}`}
-        className="mt-5 flex h-12 w-full items-center justify-center rounded-lg border border-navy-line font-semibold text-white hover:border-saffron hover:text-saffron"
-      >
-        Create an account
-      </Link>
-
       <p className="mt-8 text-center text-sm text-fog">
-        This is not your UMS login. Use the password you created for LPU Task Guide.
+        This is not your UMS login. Use the LPU Task Guide login you were given.
       </p>
     </AuthLayout>
   )

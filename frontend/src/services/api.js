@@ -57,10 +57,6 @@ export function logout() {
 
 /* ---------- API calls (each returns the `data` part of the response) ---------- */
 
-export async function signup({ name, registrationNumber, program, password }) {
-  const response = await api.post('/auth/register', { name, registrationNumber, program, password })
-  return response.data.data // { token, student }
-}
 
 export async function login(registrationNumber, password) {
   const response = await api.post('/auth/login', { registrationNumber, password })
@@ -73,10 +69,10 @@ export async function getTasks(search = '') {
   return response.data.data // { tasks, categories, portals }
 }
 
-// Module 1 – "Your updates" (sample data, only for the demo account)
+// Module 1 – "Your updates" (sample data: LPU has no public API)
 export async function getUpdates() {
   const response = await api.get('/updates')
-  return response.data.data // { isDemo, updates }
+  return response.data.data // { updates }
 }
 
 // Module 2 – Task Journey Engine

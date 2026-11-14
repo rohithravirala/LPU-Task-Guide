@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 
-// Dark form fields for the Sign in / Sign up pages (styled like LPU Live).
+// Dark form fields for the Sign in page (styled like LPU Live).
 const inputClass =
   'h-12 w-full rounded-lg border border-navy-line bg-navy-soft px-4 text-base text-white placeholder:text-fog/70 focus:border-flame focus:ring-2 focus:ring-flame/30 focus:outline-none'
 
@@ -69,16 +69,5 @@ export function AuthError({ children }) {
     <p role="alert" className="mt-6 rounded-lg border border-danger/50 bg-danger/15 px-4 py-3 text-sm text-danger-light">
       {children}
     </p>
-  )
-}
-
-// "──── New here? ────" line between the form and the other page's link
-export function AuthDivider({ children }) {
-  return (
-    <div className="mt-10 flex items-center gap-3 text-sm text-fog">
-      <span className="h-px flex-1 bg-navy-line" aria-hidden="true" />
-      {children}
-      <span className="h-px flex-1 bg-navy-line" aria-hidden="true" />
-    </div>
   )
 }
