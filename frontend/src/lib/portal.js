@@ -13,13 +13,11 @@ import {
   Wallet,
 } from 'lucide-react'
 
-// Text for a task's "Open" button. LPU Touch is a phone app, so its link goes to the app store.
 export function openLabel(portal) {
   if (!portal) return 'Open'
   return portal.type === 'Mobile App' ? `Get ${portal.name}` : `Open ${portal.name}`
 }
 
-// "https://ums.lpu.in/lpuums/..." -> "ums.lpu.in", shown so students can check the address
 export function hostOf(url) {
   try {
     return new URL(url).host.replace(/^www\./, '')
@@ -28,13 +26,14 @@ export function hostOf(url) {
   }
 }
 
-// Label in front of a portal's address: a website has an official address,
-// a phone app (LPU Touch) is opened from its app store page.
 export function addressLabel(portal) {
   return portal?.type === 'Mobile App' ? 'App store:' : 'Official address:'
 }
 
-// One icon per task category (shown on the orange label of each category card)
+export function countTasks(tasks, portalSlug) {
+  return tasks.filter((task) => task.portal?.slug === portalSlug).length
+}
+
 const categoryIcons = {
   'Assignments & Courses': BookOpen,
   'Attendance & Timetable': CalendarCheck,

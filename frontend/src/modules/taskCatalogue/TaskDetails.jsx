@@ -7,25 +7,17 @@ import TabCard from '../../components/TabCard'
 import { hostOf, openLabel } from '../../lib/portal'
 import { getErrorMessage, getJourney } from '../../services/api'
 
-// Explains a task BEFORE the student starts it: where it is, a button to open it,
-// what to keep ready, and the steps.
 export default function TaskDetails() {
-  const { taskId } = useParams() // the :taskId part of the URL
+  const { taskId } = useParams()
   const [journey, setJourney] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
     let ignore = false
     getJourney(taskId)
-      .then((data) => {
-        if (!ignore) setJourney(data)
-      })
-      .catch((err) => {
-        if (!ignore) setError(getErrorMessage(err))
-      })
-    return () => {
-      ignore = true
-    }
+      .then((data) => { if (!ignore) setJourney(data) })
+      .catch((err) => { if (!ignore) setError(getErrorMessage(err)) })
+    return () => { ignore = true }
   }, [taskId])
 
   if (error) {
@@ -56,7 +48,6 @@ export default function TaskDetails() {
         </div>
       </header>
 
-      {/* Where it is + the button that takes the student there */}
       {portal && task.openUrl && (
         <TabCard title={`Where to find it on ${portal.name}`} icon={Signpost} className="mt-12">
           <div className="px-5 pb-6 sm:px-6">
@@ -128,7 +119,6 @@ export default function TaskDetails() {
                 <span className="pt-0.5">
                   <span className="font-semibold text-ink">{step.title}</span>
                   {step.isOptional && <span className="text-muted"> (optional)</span>}
-                  {/* Only mention the place when it is not the task's own portal */}
                   {step.service && step.service._id !== portal?._id && (
                     <span className="block text-sm text-muted">Where: {step.service.name}</span>
                   )}

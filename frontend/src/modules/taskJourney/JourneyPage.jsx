@@ -7,8 +7,6 @@ import PortalMark from '../../components/PortalMark'
 import { openLabel } from '../../lib/portal'
 import { getErrorMessage, getJourney } from '../../services/api'
 
-// The student's own ticks are saved in this browser (localStorage).
-// They never tell the university that anything was completed.
 function loadDoneSteps(taskId) {
   try {
     return JSON.parse(localStorage.getItem(`journey-${taskId}`)) ?? []
@@ -17,25 +15,18 @@ function loadDoneSteps(taskId) {
   }
 }
 
-// MODULE 2 – Task Journey Engine: the step-by-step guide for one task.
 export default function JourneyPage() {
   const { taskId } = useParams()
   const [journey, setJourney] = useState(null)
   const [error, setError] = useState('')
-  const [doneSteps, setDoneSteps] = useState(() => loadDoneSteps(taskId)) // ids of finished steps
+  const [doneSteps, setDoneSteps] = useState(() => loadDoneSteps(taskId))
 
   useEffect(() => {
     let ignore = false
     getJourney(taskId)
-      .then((data) => {
-        if (!ignore) setJourney(data)
-      })
-      .catch((err) => {
-        if (!ignore) setError(getErrorMessage(err))
-      })
-    return () => {
-      ignore = true
-    }
+      .then((data) => { if (!ignore) setJourney(data) })
+      .catch((err) => { if (!ignore) setError(getErrorMessage(err)) })
+    return () => { ignore = true }
   }, [taskId])
 
   function toggleStep(stepId) {
@@ -44,7 +35,7 @@ export default function JourneyPage() {
     try {
       localStorage.setItem(`journey-${taskId}`, JSON.stringify(updated))
     } catch {
-      // Storage blocked (private window): the ticks still work until the page is closed
+      return
     }
   }
 
@@ -54,7 +45,6 @@ export default function JourneyPage() {
   const { task, steps } = journey
   const doneCount = steps.filter((step) => doneSteps.includes(step._id)).length
   const percent = steps.length ? Math.round((doneCount / steps.length) * 100) : 0
-  // The step to do now = the first required step that is not done yet
   const currentStep = steps.find((step) => !step.isOptional && !doneSteps.includes(step._id))
 
   return (
@@ -71,7 +61,6 @@ export default function JourneyPage() {
         </div>
       </header>
 
-      {/* Progress */}
       <div className="mt-8 rounded-2xl border border-line bg-surface p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-semibold text-ink">
@@ -119,7 +108,6 @@ export default function JourneyPage() {
         onToggle={toggleStep}
       />
 
-      {/* Module 3 inside Module 2: questions about this task */}
       <div className="mt-14">
         <FAQ taskId={task._id} title="Questions about this task" />
       </div>

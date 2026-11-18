@@ -4,12 +4,9 @@ import Brand from '../components/Brand'
 import TaskList from '../modules/taskCatalogue/TaskList'
 import { isLoggedIn } from '../services/api'
 
-// PUBLIC page: every task from every portal, without signing in.
-// Open buttons work for everyone; the step-by-step guides ask to sign in first.
 export default function Explore() {
   const { search } = useLocation()
 
-  // Signed-in students already have this list on their dashboard
   if (isLoggedIn()) return <Navigate to={`/${search}`} replace />
 
   return (

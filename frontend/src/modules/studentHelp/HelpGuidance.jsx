@@ -4,7 +4,6 @@ import PortalMark from '../../components/PortalMark'
 import TabCard from '../../components/TabCard'
 import { getErrorMessage, getServices } from '../../services/api'
 
-// What to do when stuck (the same advice for every student)
 const whenStuck = [
   'Open your task and follow the steps in order.',
   'Look for your problem in the common questions.',
@@ -12,23 +11,14 @@ const whenStuck = [
   'Still stuck? Go to the Student Help Desk with a screenshot of the problem.',
 ]
 
-// "If you are stuck" advice + every portal and office (from the database).
 export default function HelpGuidance() {
   const [services, setServices] = useState([])
   const [error, setError] = useState('')
 
   useEffect(() => {
-    let ignore = false
     getServices()
-      .then((data) => {
-        if (!ignore) setServices(data)
-      })
-      .catch((err) => {
-        if (!ignore) setError(getErrorMessage(err))
-      })
-    return () => {
-      ignore = true
-    }
+      .then(setServices)
+      .catch((err) => setError(getErrorMessage(err)))
   }, [])
 
   return (

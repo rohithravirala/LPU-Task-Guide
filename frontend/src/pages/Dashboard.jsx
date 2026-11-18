@@ -2,8 +2,6 @@ import TaskList from '../modules/taskCatalogue/TaskList'
 import YourUpdates from '../modules/taskCatalogue/YourUpdates'
 import { getStudent } from '../services/api'
 
-// First page after login (Module 1 – Task Catalogue):
-// quick links, search, "Your updates" right under the search box, then every task.
 export default function Dashboard() {
   const firstName = getStudent()?.name?.split(' ')[0] ?? 'there'
 

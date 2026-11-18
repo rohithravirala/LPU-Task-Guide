@@ -1,64 +1,51 @@
 @import "tailwindcss";
 
-/* LPU Task Guide colours and fonts. Tailwind turns each one into classes,
-   e.g. --color-flame -> bg-flame / text-flame / border-flame.
-   The colours are taken from the official LPU portals:
-   UMS (light pages, orange rail, blue link buttons) and LPU Live (sign-in page, orange buttons). */
 @theme {
-  --color-*: initial; /* use only our own colours */
+  --color-*: initial;
   --color-white: #ffffff;
 
-  /* LPU orange */
-  --color-flame: #ea580b; /* buttons, active tabs, card labels (LPU Live orange) */
-  --color-flame-deep: #c2410c; /* hover, and orange text on white (easy to read) */
-  --color-flame-wash: #fff1e6; /* light orange backgrounds */
-  --color-saffron: #f68121; /* UMS orange: card borders, highlights */
-  --color-apricot: #ffa95b; /* UMS left menu */
-  --color-apricot-soft: #fccb92; /* UMS notice strip */
+  --color-flame: #ea580b;
+  --color-flame-deep: #c2410c;
+  --color-flame-wash: #fff1e6;
+  --color-saffron: #f68121;
+  --color-apricot: #ffa95b;
+  --color-apricot-soft: #fccb92;
 
-  /* UMS blue (link buttons like "Fee Dashboard", "Date Sheet") */
   --color-blue: #1779ba;
   --color-blue-deep: #115f93;
   --color-blue-wash: #e8f2fa;
 
-  /* Portal badge colours */
   --color-violet: #6d28d9;
   --color-violet-wash: #f1eafe;
   --color-teal: #0f766e;
   --color-teal-wash: #e3f4f1;
 
-  /* LPU Live dark (sign-in page) */
-  --color-night: #0a0a0a; /* form side */
-  --color-navy: #141c2b; /* page behind the card */
-  --color-navy-soft: #1f2937; /* inputs */
-  --color-navy-line: #374151; /* input borders */
-  --color-fog: #9ca3af; /* secondary text on dark */
-  --color-ember: #5f220e; /* warm end of the sign-in gradient */
-  --color-ember-deep: #0f0503; /* dark start of the sign-in gradient */
+  --color-night: #0a0a0a;
+  --color-navy: #141c2b;
+  --color-navy-soft: #1f2937;
+  --color-navy-line: #374151;
+  --color-fog: #9ca3af;
+  --color-ember: #5f220e;
+  --color-ember-deep: #0f0503;
 
-  /* Light pages (UMS) */
-  --color-paper: #f8f8f8; /* page background */
-  --color-blush: #fbf1f1; /* soft pink panels */
-  --color-surface: #ffffff; /* cards */
-  --color-line: #ebe5e0; /* borders */
+  --color-paper: #f8f8f8;
+  --color-blush: #fbf1f1;
+  --color-surface: #ffffff;
+  --color-line: #ebe5e0;
   --color-line-strong: #d8d0c8;
 
-  /* Text */
-  --color-ink: #16181d; /* headings */
-  --color-charcoal: #2b2f36; /* main text */
-  --color-muted: #646b76; /* secondary text */
+  --color-ink: #16181d;
+  --color-charcoal: #2b2f36;
+  --color-muted: #646b76;
 
-  /* Status */
-  --color-leaf: #23874a; /* done */
+  --color-leaf: #23874a;
   --color-leaf-wash: #e9f6ee;
   --color-danger: #b42318;
   --color-danger-wash: #fdeceb;
-  --color-danger-light: #fecdca; /* error text on the dark sign-in page */
+  --color-danger-light: #fecdca;
 
-  /* Outfit is the font of LPU Live; the serif is used for its quote */
   --font-sans: "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
-  /* Montserrat only for the "LPU Task Guide" name: close to the lettering of the LPU logo */
   --font-brand: "Montserrat", "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -88,13 +75,11 @@
     outline-offset: 2px;
   }
 
-  /* Sections that scroll on their own (task categories, Your updates): a thin orange scrollbar */
   .scroll-area {
     scrollbar-width: thin;
     scrollbar-color: var(--color-apricot) transparent;
   }
 
-  /* Hide the scrollbar of sideways-scrolling rows (portal tabs) on phones */
   .no-scrollbar {
     scrollbar-width: none;
   }

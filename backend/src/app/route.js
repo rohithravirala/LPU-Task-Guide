@@ -1,6 +1,5 @@
 import { categories, faqs, portals, tasks } from '@/data/store';
 
-// The student app (the API itself lives under /api)
 const APP_URL = process.env.APP_URL || 'https://lpu-task-guide.vercel.app';
 
 const endpoints = [
@@ -13,7 +12,6 @@ const endpoints = [
   ['GET', '/api/services', 'Portals and offices'],
 ];
 
-// GET /  ->  a small page saying the API is running, instead of a 404
 export function GET() {
   const rows = endpoints
     .map(([method, path, what]) => `<tr><td><b>${method}</b></td><td><code>${path}</code></td><td>${what}</td></tr>`)

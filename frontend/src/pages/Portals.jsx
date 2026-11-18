@@ -3,31 +3,17 @@ import { Link } from 'react-router-dom'
 import { AppWindow, ArrowRight, ArrowUpRight, ShieldCheck, Smartphone } from 'lucide-react'
 import PortalMark from '../components/PortalMark'
 import TabCard from '../components/TabCard'
-import { addressLabel, hostOf, openLabel } from '../lib/portal'
+import { addressLabel, countTasks, hostOf, openLabel } from '../lib/portal'
 import { getErrorMessage, getTasks } from '../services/api'
 
-// All five LPU portals: what each one is for, its official address, and how many tasks it has.
 export default function Portals() {
-  const [state, setState] = useState({ status: 'loading', portals: [], countByPortal: {}, error: '' })
+  const [data, setData] = useState(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    let ignore = false
     getTasks()
-      .then(({ tasks, portals }) => {
-        if (ignore) return
-        const countByPortal = {}
-        for (const task of tasks) {
-          const slug = task.portal?.slug
-          if (slug) countByPortal[slug] = (countByPortal[slug] ?? 0) + 1
-        }
-        setState({ status: 'ready', portals, countByPortal, error: '' })
-      })
-      .catch((err) => {
-        if (!ignore) setState((previous) => ({ ...previous, status: 'error', error: getErrorMessage(err) }))
-      })
-    return () => {
-      ignore = true
-    }
+      .then(setData)
+      .catch((err) => setError(getErrorMessage(err)))
   }, [])
 
   return (
@@ -37,16 +23,16 @@ export default function Portals() {
         LPU work is spread over five official portals. Open one directly, or see every task you can do there.
       </p>
 
-      {state.status === 'loading' && <p className="mt-10 text-muted">Loading portals…</p>}
-      {state.status === 'error' && (
+      {!data && !error && <p className="mt-10 text-muted">Loading portals…</p>}
+      {error && (
         <p role="alert" className="mt-10 rounded-xl bg-danger-wash px-4 py-3 text-danger">
-          {state.error}
+          {error}
         </p>
       )}
 
       <div className="mt-12 grid gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
-        {state.portals.map((portal) => {
-          const count = state.countByPortal[portal.slug] ?? 0
+        {data?.portals.map((portal) => {
+          const count = countTasks(data.tasks, portal.slug)
           return (
             <TabCard key={portal.slug} title={portal.name} icon={portal.type === 'Mobile App' ? Smartphone : AppWindow} className="flex flex-col">
               <div className="flex flex-1 flex-col px-5 pb-5">

@@ -1,17 +1,3 @@
-// All content of LPU Task Guide, hard-coded (there is no database).
-// Edit this file; `npm run dev` reloads it, and store.js checks every name on start.
-//
-// IMPORTANT: these steps are general guidance written for the project. They do not
-// state official university rules, deadlines or fee amounts. Only add an official
-// `url` after checking that it is the correct university link.
-//
-// UMS menu paths are copied from the real UMS menus (Academics, Administrative and
-// Important Links). Menu names can change; update `menuPath` when they do.
-
-/* ------------------------------------------------------------------ */
-/* Portals (where tasks are done) and offices                          */
-/* ------------------------------------------------------------------ */
-
 export const services = [
   {
     name: 'UMS',
@@ -80,21 +66,6 @@ export const services = [
   { name: 'School / Department Office', type: 'Office', description: 'Your own school or department, for course-specific questions.' },
 ];
 
-/* ------------------------------------------------------------------ */
-/* Tasks                                                               */
-/* ------------------------------------------------------------------ */
-//
-// Every task has a `portal` (a portal name above) and, when known, a `menuPath`:
-// where to click inside that portal. The task's "Open" button goes to the portal
-// (or to `url`, when the exact page link has been checked).
-//
-// `isPopular` tasks are shown under Quick links with their short `shortTitle`.
-//
-// Steps: write `steps` by hand, OR leave them out and store.js builds them:
-//   1. Open <portal>   2. Go to <menu path>   3. Open "<last menu item>" + `howTo`
-// `extraSteps` are added after the built steps. `howToTitle` replaces the title of
-// step 3, `stepNote` adds a warning to it. A step's `service` is a service name above.
-
 const LOGIN = {
   UMS: 'Your registration number and UMS password',
   'LPU Live': 'Your LPU Live ID and password',
@@ -103,7 +74,6 @@ const LOGIN = {
   'LPU Touch': 'The LPU Touch app and your UMS login',
 };
 
-// Small helpers so each task says its portal once and gets the login requirement automatically
 function onPortal(portal, menuPath, task) {
   return { portal, menuPath, ...task, requirements: [LOGIN[portal], ...(task.requirements ?? [])] };
 }
@@ -119,14 +89,9 @@ const PLACEMENT = ['Academics', 'Placement Services'];
 const FEES = ['Administrative', 'Fee and Scholarship System'];
 const HOSTEL = ['Administrative', 'Residential Services'];
 const LPU_LIVE_CHAT = 'https://lpulive.lpu.in/chat';
-
-// Exact UMS pages. Only add a page here after checking it: a real UMS page answers a
-// logged-out browser by redirecting to LoginNew.aspx, a wrong name answers 404.
-// When the student is already logged in to UMS, the page opens directly.
 const UMS_PAGE = 'https://ums.lpu.in/lpuums/';
 
 export const tasks = [
-  /* ---------- Attendance & Timetable ---------- */
   ums([...LMS, 'View Attendance'], {
     title: 'Check your attendance',
     category: 'Attendance & Timetable',
@@ -171,8 +136,6 @@ export const tasks = [
     estimatedMinutes: 2,
     howTo: ['Open the attendance section and check each course.', 'For a wrong entry, contact your course teacher or department office.'],
   }),
-
-  /* ---------- Examinations & Results ---------- */
   ums(['Important Links', 'Date Sheet'], {
     title: 'Find your examination schedule',
     category: 'Examinations & Results',
@@ -225,8 +188,6 @@ export const tasks = [
       { title: 'Check that the fine is cleared', service: 'Accounts Office', instructions: ['Check UMS again after some time.', 'If it still shows, contact the Accounts Office with your transaction number.'] },
     ],
   }),
-
-  /* ---------- Assignments & Courses ---------- */
   ums([...LMS, 'Assignment Upload'], {
     title: 'Upload an assignment',
     category: 'Assignments & Courses',
@@ -243,7 +204,7 @@ export const tasks = [
     title: 'See a course syllabus',
     category: 'Assignments & Courses',
     summary: 'Units, topics and books for any of your courses.',
-    url: `${UMS_PAGE}frmAcademicSyllabusReport.aspx`, // checked 2026-11-14
+    url: `${UMS_PAGE}frmAcademicSyllabusReport.aspx`,
     keywords: ['syllabus', 'course', 'topics', 'units', 'books'],
     estimatedMinutes: 5,
     howTo: ['Choose the course to see its syllabus.'],
@@ -263,8 +224,6 @@ export const tasks = [
       { title: 'Verify what was saved', service: 'UMS', instructions: ['Open the same page again and check that your choice was saved.'] },
     ],
   }),
-
-  /* ---------- Coding Practice & Tests ---------- */
   codetantra(['Test'], {
     title: 'Take a CodeTantra test',
     category: 'Coding Practice & Tests',
@@ -308,8 +267,6 @@ export const tasks = [
     howToTitle: 'Start the test from your course',
     howTo: ['Find the test in your course and check its time window.', 'Start only when you are ready: tests usually have a timer.', 'Submit before time runs out.'],
   }),
-
-  /* ---------- Fees & Scholarships ---------- */
   ums([...FEES, 'Fee Dashboard'], {
     title: 'Pay your university fees',
     category: 'Fees & Scholarships',
@@ -335,8 +292,6 @@ export const tasks = [
     estimatedMinutes: 5,
     howTo: ['Find the payment and download or print its receipt.'],
   }),
-
-  /* ---------- Hostel & Campus Life ---------- */
   ums([...HOSTEL, 'Hostel Booking'], {
     title: 'Book a hostel room',
     category: 'Hostel & Campus Life',
@@ -350,7 +305,7 @@ export const tasks = [
     title: 'Apply for hostel leave',
     category: 'Leave & Applications',
     summary: 'Get permission before you leave the hostel overnight.',
-    url: `${UMS_PAGE}frmStudentHostelLeaveApplicationTermWise.aspx`, // checked 2026-11-14
+    url: `${UMS_PAGE}frmStudentHostelLeaveApplicationTermWise.aspx`,
     keywords: ['hostel', 'leave', 'home', 'outing', 'night out', 'leave slip'],
     estimatedMinutes: 10,
     isPopular: true,
@@ -365,8 +320,6 @@ export const tasks = [
     estimatedMinutes: 2,
     howTo: ['Check each book and its return date.'],
   }),
-
-  /* ---------- Placements & Internships ---------- */
   ums([...PLACEMENT, 'Placement Portal'], {
     title: 'Open the placement portal',
     category: 'Placements & Internships',
@@ -383,8 +336,6 @@ export const tasks = [
     estimatedMinutes: 2,
     howTo: ['Open the placement section to see your profile.'],
   }),
-
-  /* ---------- Documents & Certificates ---------- */
   ums(['Important Links', 'Certificate Request'], {
     title: 'Request a bonafide certificate',
     category: 'Documents & Certificates',
@@ -407,8 +358,6 @@ export const tasks = [
     estimatedMinutes: 1,
     howTo: ['Your virtual ID card opens on screen.'],
   }),
-
-  /* ---------- Leave & Applications ---------- */
   ums(['Academics', 'Research and Development', 'Apply for Duty Leave and PVR'], {
     title: 'Apply for duty leave',
     category: 'Leave & Applications',
@@ -424,8 +373,6 @@ export const tasks = [
       { title: 'Track the approval', service: 'UMS', instructions: ['Check the status and keep a copy of the approval.'] },
     ],
   }),
-
-  /* ---------- Messages & Notices ---------- */
   live(['University Groups', 'Your course group'], {
     title: 'Message your course group',
     category: 'Messages & Notices',
@@ -459,8 +406,6 @@ export const tasks = [
       { title: 'Act before the deadline', instructions: ['Note what the notice asks you to do and when.'] },
     ],
   }),
-
-  /* ---------- Profile & Help ---------- */
   ums(['Important Links', 'Emergency Numbers'], {
     title: 'Find emergency numbers',
     category: 'Profile & Help',
@@ -485,10 +430,6 @@ export const tasks = [
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/* FAQs                                                                */
-/* ------------------------------------------------------------------ */
-// `task` is the title of a task above (optional).
 export const faqs = [
   { category: 'Portals', question: 'Which portal do I use for what?', answer: 'UMS: attendance, exams, fees, hostel, placements and official requests. LPU Live: your course groups, chats with teachers and announcements. CodeTantra (MyClass): online tests and coding labs. NeoColab: coding practice and PEP tests. LPU Touch: UMS on your phone.', keywords: ['portal', 'ums', 'lpu live', 'codetantra', 'neocolab', 'lpu touch', 'which'] },
   { category: 'Portals', question: 'Why does “Open” take me to the UMS home page and not the exact page?', answer: 'UMS pages only open after you log in, so we take you to UMS and show the exact menu path, for example Academics › Examination System › Academic Result. Follow that path after logging in.', keywords: ['open', 'link', 'redirect', 'ums', 'menu'] },
@@ -504,12 +445,6 @@ export const faqs = [
   { category: 'Help', question: 'Are “Your updates” real?', answer: 'No. LPU has no public API, so “Your updates” shows sample data to explain the idea: with an official API, your real deadlines and messages from UMS, LPU Live, CodeTantra and NeoColab would appear there. The tasks, menu paths and Open links are real.', keywords: ['demo', 'updates', 'api', 'sample', 'real'] },
 ];
 
-/* ------------------------------------------------------------------ */
-/* Sample updates ("Your updates" on the dashboard)                    */
-/* ------------------------------------------------------------------ */
-// SAMPLE data: a real version would get these from the portals through an official
-// LPU API, which does not exist publicly. `task` is the title of a task above,
-// `dueInDays` turns into a date counted from today, so the dates never go stale.
 export const demoUpdates = [
   { kind: 'alert', task: 'Check your attendance', title: 'Attendance below 75% in MTH174', detail: 'Currently 71%. Talk to your course teacher if an entry is wrong.' },
   { kind: 'deadline', task: 'Upload an assignment', title: 'CSC301 assignment 2', detail: 'Data Structures · upload a PDF on UMS', dueInDays: 2 },

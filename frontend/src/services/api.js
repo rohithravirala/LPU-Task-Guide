@@ -1,19 +1,15 @@
 import axios from 'axios'
 
-// Every call to the backend goes through this one axios instance.
-// VITE_API_URL comes from frontend/.env (e.g. http://localhost:3000/api).
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
 })
 
-// Before every request: attach the login token, so the backend knows who is asking.
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
-// After every response: if the backend says 401 (token missing/expired), log out.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -26,12 +22,9 @@ api.interceptors.response.use(
   },
 )
 
-// Turns any axios error into a message we can show on screen.
 export function getErrorMessage(error) {
   return error.response?.data?.message || 'Could not reach the server. Is the backend running?'
 }
-
-/* ---------- Login session (stored in the browser) ---------- */
 
 export function saveSession({ token, student }) {
   localStorage.setItem('token', token)
@@ -55,45 +48,12 @@ export function logout() {
   localStorage.removeItem('student')
 }
 
-/* ---------- API calls (each returns the `data` part of the response) ---------- */
+const getData = (request) => request.then((response) => response.data.data)
 
-
-export async function login(registrationNumber, password) {
-  const response = await api.post('/auth/login', { registrationNumber, password })
-  return response.data.data // { token, student }
-}
-
-// "Try demo" button: signs in as the demo account (no password needed in the browser)
-export async function loginAsDemo() {
-  const response = await api.post('/auth/demo')
-  return response.data.data // { token, student }
-}
-
-// Module 1 – Task Catalogue (public: works without logging in)
-export async function getTasks(search = '') {
-  const response = await api.get('/tasks', { params: { search } })
-  return response.data.data // { tasks, categories, portals }
-}
-
-// Module 1 – "Your updates" (sample data: LPU has no public API)
-export async function getUpdates() {
-  const response = await api.get('/updates')
-  return response.data.data // { updates }
-}
-
-// Module 2 – Task Journey Engine
-export async function getJourney(taskId) {
-  const response = await api.get(`/journeys/${taskId}`)
-  return response.data.data // { task, steps }
-}
-
-// Module 3 – Student Guidance and Help
-export async function getFaqs({ search = '', taskId = '' } = {}) {
-  const response = await api.get('/faqs', { params: { search, taskId } })
-  return response.data.data
-}
-
-export async function getServices() {
-  const response = await api.get('/services')
-  return response.data.data
-}
+export const login = (registrationNumber, password) => getData(api.post('/auth/login', { registrationNumber, password }))
+export const loginAsDemo = () => getData(api.post('/auth/demo'))
+export const getTasks = (search = '') => getData(api.get('/tasks', { params: { search } }))
+export const getUpdates = () => getData(api.get('/updates'))
+export const getJourney = (taskId) => getData(api.get(`/journeys/${taskId}`))
+export const getFaqs = ({ search, taskId }) => getData(api.get('/faqs', { params: { search, taskId } }))
+export const getServices = () => getData(api.get('/services'))

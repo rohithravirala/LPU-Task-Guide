@@ -3,13 +3,11 @@ import { LogOut } from 'lucide-react'
 import Brand from './Brand'
 import { getStudent, logout } from '../services/api'
 
-// "Ravirala Rohith" -> "RR"
 function initialsOf(name = '') {
   const letters = name.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0].toUpperCase())
   return letters.join('') || '?'
 }
 
-// Top bar, like the UMS header: logo on the left, the logged-in student on the right.
 export default function Navbar() {
   const navigate = useNavigate()
   const student = getStudent()
