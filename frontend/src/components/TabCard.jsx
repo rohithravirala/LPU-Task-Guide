@@ -1,9 +1,6 @@
 import { useId } from 'react'
 import { Bookmark } from 'lucide-react'
 
-// The UMS dashboard card: a white card with an orange label sitting on its top border
-// (like "Happening" and "My Messages" on the UMS dashboard).
-// The label sticks out 1rem above the card, so leave at least that much space above it.
 export default function TabCard({ title, icon: Icon = Bookmark, count, action, children, className = '' }) {
   const headingId = useId()
 

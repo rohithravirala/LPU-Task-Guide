@@ -3,9 +3,6 @@ import { ChevronDown, CircleHelp, Search } from 'lucide-react'
 import TabCard from '../../components/TabCard'
 import { getErrorMessage, getFaqs } from '../../services/api'
 
-// List of questions and answers, in an orange-label card.
-//  - On the Help page: all FAQs with a search box.
-//  - On a guide page (taskId given): only that task's FAQs, no search box.
 export default function FAQ({ taskId = '', title }) {
   const [faqs, setFaqs] = useState([])
   const [searchText, setSearchText] = useState('')
@@ -26,9 +23,7 @@ export default function FAQ({ taskId = '', title }) {
         setError(getErrorMessage(err))
         setStatus('error')
       })
-    return () => {
-      ignore = true
-    }
+    return () => { ignore = true }
   }, [search, taskId])
 
   function handleSearch(event) {
@@ -38,7 +33,6 @@ export default function FAQ({ taskId = '', title }) {
     setSearch(searchText.trim())
   }
 
-  // A task with no FAQs shows nothing on its guide page
   if (taskId && status === 'ready' && faqs.length === 0) return null
 
   return (
@@ -71,7 +65,6 @@ export default function FAQ({ taskId = '', title }) {
           {status === 'ready' && faqs.length > 0 && (
             <div className="divide-y divide-line rounded-xl border border-line">
               {faqs.map((faq) => (
-                // <details> is a built-in HTML accordion: click the question to see the answer
                 <details key={faq._id} className="group px-4 py-3.5 open:bg-flame-wash/40">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink [&::-webkit-details-marker]:hidden">
                     {faq.question}

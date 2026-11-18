@@ -3,62 +3,36 @@ import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import { findDemoStudent, findStudentByRegistrationNumber } from '@/data/store';
 
-// Creates the login token. It proves "this student is logged in" and expires after 7 days.
-function createToken(student) {
-  return jwt.sign({ studentId: student._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+function signedIn(student, message) {
+  const token = jwt.sign({ studentId: student._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const { name, registrationNumber, program } = student;
+  return NextResponse.json({ success: true, message, data: { token, student: { name, registrationNumber, program } } });
 }
 
-// The student details the frontend is allowed to see (never the password hash).
-function publicStudent(student) {
-  return { name: student.name, registrationNumber: student.registrationNumber, program: student.program };
-}
-
-function badRequest(message, status = 400) {
+function failed(message, status) {
   return NextResponse.json({ success: false, message }, { status });
 }
 
-// POST /api/auth/login   body: { registrationNumber, password }
-// Accounts are listed in src/data/students.js (there is no sign-up).
 export async function login(request) {
   try {
     const body = await request.json().catch(() => ({}));
-    // String() makes sure nobody can send an object here
     const registrationNumber = String(body.registrationNumber ?? '').trim().toUpperCase();
     const password = String(body.password ?? '');
-
-    if (!registrationNumber || !password) return badRequest('Enter your registration number and password');
+    if (!registrationNumber || !password) return failed('Enter your registration number and password', 400);
 
     const student = findStudentByRegistrationNumber(registrationNumber);
-
-    // Compare the typed password with the stored bcrypt hash
-    const passwordIsCorrect = student && (await bcrypt.compare(password, student.passwordHash));
-    if (!passwordIsCorrect) {
-      // Same message for both cases, so nobody can guess which numbers exist
-      return badRequest('Registration number or password is incorrect', 401);
+    if (!student || !(await bcrypt.compare(password, student.passwordHash))) {
+      return failed('Registration number or password is incorrect', 401);
     }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Login successful',
-      data: { token: createToken(student), student: publicStudent(student) },
-    });
+    return signedIn(student, 'Login successful');
   } catch (error) {
     console.error('Login failed:', error.message);
-    return badRequest('Login failed. Please try again.', 500);
+    return failed('Login failed. Please try again.', 500);
   }
 }
 
-// POST /api/auth/demo   (no body)
-// The "Try demo" button on the Sign in page: signs in as the demo account
-// (isDemo in src/data/students.js) without typing anything, so testers never see its password.
-// The demo account only sees the same guidance as everyone plus sample updates.
 export async function demoLogin() {
   const student = findDemoStudent();
-  if (!student) return badRequest('The demo account is not available', 404);
-
-  return NextResponse.json({
-    success: true,
-    message: 'Signed in to the demo account',
-    data: { token: createToken(student), student: publicStudent(student) },
-  });
+  if (!student) return failed('The demo account is not available', 404);
+  return signedIn(student, 'Signed in to the demo account');
 }

@@ -1,42 +1,24 @@
-// The app's data, built once from the hard-coded files in this folder (no database).
-// It gives every item an `_id`, builds the steps of tasks that have none, links every
-// name to its object, and stops with a clear error if content.js names something unknown.
 import { demoUpdates, faqs as faqContent, services as serviceContent, tasks as taskContent } from './content.js';
 import { students } from './students.js';
 
-// "Check your attendance" -> "check-your-attendance" (used as the id in page addresses)
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-/* ---------- Services: portals (UMS, LPU Live ...) and offices ---------- */
+const slugify = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export const services = serviceContent.map((service) => ({ ...service, _id: service.slug ?? slugify(service.name) }));
-const serviceByName = new Map(services.map((service) => [service.name, service]));
+export const portals = services.filter((service) => service.isPortal).sort((a, b) => a.order - b.order);
 
-function serviceNamed(name, where) {
+function findService(name, where) {
   if (!name) return null;
-  const service = serviceByName.get(name);
+  const service = services.find((s) => s.name === name);
   if (!service) throw new Error(`Unknown service "${name}" in ${where} (src/data/content.js)`);
   return service;
 }
 
-export const portals = services.filter((service) => service.isPortal).sort((a, b) => a.order - b.order);
-
-/* ---------- Tasks and their steps ---------- */
-
-// A task without hand-written steps gets them from its portal and menu path:
-//   1. Open <portal>   2. Go to <menu> › <section>   3. Open "<item>" and do the task
 function stepsFromMenu(task, portal) {
   if (!portal) throw new Error(`Task "${task.title}" needs either "steps" or a "portal"`);
 
   const path = task.menuPath ?? [];
   const parents = path.slice(0, -1);
   const target = path.at(-1);
-
   const steps = [
     {
       title: `Open ${portal.name}`,
@@ -48,14 +30,11 @@ function stepsFromMenu(task, portal) {
     },
   ];
 
-  if (parents.length > 0) {
+  if (parents.length) {
     steps.push({
       title: `Go to ${parents.join(' › ')}`,
       service: portal.name,
-      instructions: [
-        ...parents.map((part, index) => (index === 0 ? `Open “${part}”.` : `Look under “${part}”.`)),
-        portal.menuHint,
-      ],
+      instructions: [...parents.map((part, i) => (i === 0 ? `Open “${part}”.` : `Look under “${part}”.`)), portal.menuHint],
     });
   }
 
@@ -65,14 +44,14 @@ function stepsFromMenu(task, portal) {
     instructions: task.howTo ?? ['Follow the instructions on the page.'],
     note: task.stepNote,
   });
-
   return steps;
 }
 
-export const tasks = taskContent.map(({ steps, extraSteps, howTo, howToTitle, stepNote, portal: portalName, ...task }) => {
+export const tasks = taskContent.map((item) => {
+  const { steps, extraSteps = [], howTo, howToTitle, stepNote, portal: portalName, ...task } = item;
   const _id = slugify(task.title);
-  const portal = serviceNamed(portalName, `task "${task.title}"`);
-  const stepContent = steps ?? [...stepsFromMenu({ ...task, howTo, howToTitle, stepNote }, portal), ...(extraSteps ?? [])];
+  const portal = findService(portalName, `task "${task.title}"`);
+  const allSteps = steps ?? [...stepsFromMenu(item, portal), ...extraSteps];
 
   return {
     ...task,
@@ -84,64 +63,46 @@ export const tasks = taskContent.map(({ steps, extraSteps, howTo, howToTitle, st
     url: task.url ?? '',
     isPopular: Boolean(task.isPopular),
     portal,
-    steps: stepContent.map((step, index) => ({
+    steps: allSteps.map((step, index) => ({
       _id: `${_id}-${index + 1}`,
       order: index + 1,
       title: step.title,
-      instructions: (step.instructions ?? []).filter(Boolean), // drop empty hints
+      instructions: (step.instructions ?? []).filter(Boolean),
       note: step.note,
       isOptional: Boolean(step.isOptional),
-      service: serviceNamed(step.service, `a step of "${task.title}"`),
+      service: findService(step.service, `a step of "${task.title}"`),
     })),
   };
 });
 
-const taskById = new Map(tasks.map((task) => [task._id, task]));
-if (taskById.size !== tasks.length) throw new Error('Two tasks in src/data/content.js have the same title');
-const taskByTitle = new Map(tasks.map((task) => [task.title, task]));
+if (new Set(tasks.map((task) => task._id)).size !== tasks.length) {
+  throw new Error('Two tasks in src/data/content.js have the same title');
+}
 
-function taskTitled(title, where) {
-  const task = taskByTitle.get(title);
+function findTaskByTitle(title, where) {
+  const task = tasks.find((t) => t.title === title);
   if (!task) throw new Error(`${where} names an unknown task "${title}" (src/data/content.js)`);
   return task;
 }
 
-export function findTask(id) {
-  return taskById.get(id) ?? null;
-}
-
 export const categories = [...new Set(tasks.map((task) => task.category))].sort();
-
-/* ---------- FAQs ---------- */
 
 export const faqs = faqContent
   .map((faq, index) => ({
     ...faq,
     _id: `faq-${index + 1}`,
-    task: faq.task ? taskTitled(faq.task, `FAQ "${faq.question}"`)._id : null,
+    task: faq.task ? findTaskByTitle(faq.task, `FAQ "${faq.question}"`)._id : null,
     keywords: faq.keywords ?? [],
   }))
   .sort((a, b) => a.category.localeCompare(b.category) || a.question.localeCompare(b.question));
 
-/* ---------- Sample updates ---------- */
-
 export const updates = demoUpdates.map((update, index) => ({
   ...update,
   _id: `update-${index + 1}`,
-  task: taskTitled(update.task, `Update "${update.title}"`),
+  task: findTaskByTitle(update.task, `Update "${update.title}"`),
 }));
 
-/* ---------- Students ---------- */
-
-export function findStudentByRegistrationNumber(registrationNumber) {
-  return students.find((student) => student.registrationNumber === registrationNumber) ?? null;
-}
-
-export function findStudentById(id) {
-  return students.find((student) => student._id === id) ?? null;
-}
-
-// The account used by the "Try demo" button
-export function findDemoStudent() {
-  return students.find((student) => student.isDemo) ?? null;
-}
+export const findTask = (id) => tasks.find((task) => task._id === id) ?? null;
+export const findStudentById = (id) => students.find((student) => student._id === id) ?? null;
+export const findStudentByRegistrationNumber = (number) => students.find((student) => student.registrationNumber === number) ?? null;
+export const findDemoStudent = () => students.find((student) => student.isDemo) ?? null;

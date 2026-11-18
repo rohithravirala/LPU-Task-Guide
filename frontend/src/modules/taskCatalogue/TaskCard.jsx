@@ -3,10 +3,6 @@ import { ArrowUpRight, ListOrdered } from 'lucide-react'
 import MenuTrail from '../../components/MenuTrail'
 import PortalMark from '../../components/PortalMark'
 
-// One task in the list.
-//  - The title and the "Open" button take the student straight to the portal (new tab).
-//  - "Steps" opens our step-by-step guide for the task. On the public task list
-//    (`isPublic`) the guide needs a login, so it goes to Sign in and comes back here.
 export default function TaskCard({ task, isPublic = false }) {
   const { portal, openUrl } = task
   const guideLink = isPublic ? `/login?next=${encodeURIComponent(`/tasks/${task._id}`)}` : `/tasks/${task._id}`

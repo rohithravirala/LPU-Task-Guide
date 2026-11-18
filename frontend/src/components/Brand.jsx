@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import lpuSeal from '../assets/lpu-seal.svg'
 
-// LPU seal + "LPU Task Guide" wordmark, used in the top bars.
 export default function Brand({ to = '/' }) {
   return (
     <Link to={to} className="flex shrink-0 items-center gap-3" aria-label="LPU Task Guide home">

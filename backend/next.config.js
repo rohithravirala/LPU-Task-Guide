@@ -1,7 +1,4 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-  // The React app runs on a different port (5173), so the browser needs these
-  // CORS headers before it lets the React app read our API responses.
   async headers() {
     return [
       {

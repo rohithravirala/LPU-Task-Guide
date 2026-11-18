@@ -1,6 +1,5 @@
 import StepCard from './StepCard'
 
-// All steps of the guide, in order.
 export default function JourneySteps({ steps, portalId, doneSteps, currentStepId, onToggle }) {
   return (
     <ol className="mt-8 space-y-4">

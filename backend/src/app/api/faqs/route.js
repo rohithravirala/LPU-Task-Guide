@@ -1,6 +1,1 @@
-import { getFaqs } from '@/controllers/helpController';
-
-// GET /api/faqs
-export async function GET(request) {
-  return getFaqs(request);
-}
+export { getFaqs as GET } from '@/controllers/helpController';

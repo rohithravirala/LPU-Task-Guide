@@ -4,91 +4,56 @@ import { ArrowUpRight, LoaderCircle, Search, ShieldCheck, X, Zap } from 'lucide-
 import TaskCard from './TaskCard'
 import PortalMark from '../../components/PortalMark'
 import TabCard from '../../components/TabCard'
-import { addressLabel, categoryIcon, hostOf, openLabel } from '../../lib/portal'
+import { addressLabel, categoryIcon, countTasks, hostOf, openLabel } from '../../lib/portal'
 import { getErrorMessage, getTasks } from '../../services/api'
 
-// Search box + portal tabs + all tasks, grouped under their category.
-// The search text and the chosen portal live in the page address (?q=fee&portal=ums),
-// so the Portals page can link straight to one portal's tasks.
-// `isPublic`: the list on /explore, seen without signing in.
-// `belowSearch`: shown right under the search box (the dashboard puts "Your updates" there);
-// hidden while searching or filtering, so the results come straight after the search box.
+function setParam(setSearchParams, key, value) {
+  setSearchParams(
+    (previous) => {
+      const next = new URLSearchParams(previous)
+      if (value) next.set(key, value)
+      else next.delete(key)
+      return next
+    },
+    { replace: true },
+  )
+}
+
 export default function TaskList({ isPublic = false, belowSearch = null }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q') ?? ''
-  const portalSlug = searchParams.get('portal') ?? 'all'
+  const portalSlug = searchParams.get('portal')
 
-  const [searchText, setSearchText] = useState(query) // what the student is typing
-  // The last answer from the backend, and which search it belongs to
+  const [searchText, setSearchText] = useState(query)
   const [result, setResult] = useState({ query: null, tasks: [], categories: [], portals: [], error: '' })
 
-  // Load tasks when the page opens and every time the search changes
   useEffect(() => {
-    let ignore = false // ignore an old answer if a newer search was started
+    let ignore = false
     getTasks(query)
-      .then((data) => {
-        if (!ignore) setResult({ query, ...data, error: '' })
-      })
-      .catch((err) => {
-        if (!ignore) setResult((previous) => ({ ...previous, query, error: getErrorMessage(err) }))
-      })
-    return () => {
-      ignore = true
-    }
+      .then((data) => { if (!ignore) setResult({ query, ...data, error: '' }) })
+      .catch((err) => { if (!ignore) setResult((previous) => ({ ...previous, query, error: getErrorMessage(err) })) })
+    return () => { ignore = true }
   }, [query])
 
-  // Search while typing, after a short pause (no Search button needed)
   useEffect(() => {
     const text = searchText.trim()
     if (text === query) return
-    const timer = setTimeout(() => {
-      setSearchParams(
-        (previous) => {
-          const next = new URLSearchParams(previous)
-          if (text) next.set('q', text)
-          else next.delete('q')
-          return next
-        },
-        { replace: true },
-      )
-    }, 300)
+    const timer = setTimeout(() => setParam(setSearchParams, 'q', text), 300)
     return () => clearTimeout(timer)
   }, [searchText, query, setSearchParams])
 
   function choosePortal(slug) {
-    setSearchParams(
-      (previous) => {
-        const next = new URLSearchParams(previous)
-        if (slug === 'all') next.delete('portal')
-        else next.set('portal', slug)
-        return next
-      },
-      { replace: true },
-    )
+    setParam(setSearchParams, 'portal', slug)
   }
 
   function clearSearch() {
     setSearchText('')
-    setSearchParams(
-      (previous) => {
-        const next = new URLSearchParams(previous)
-        next.delete('q')
-        return next
-      },
-      { replace: true },
-    )
+    setParam(setSearchParams, 'q', '')
   }
 
   const isFirstLoad = result.query === null
   const isSearching = result.query !== query
   const { tasks, categories, portals } = result
-
-  // How many tasks each portal has (for the tab counts)
-  const countByPortal = {}
-  for (const task of tasks) {
-    const slug = task.portal?.slug
-    if (slug) countByPortal[slug] = (countByPortal[slug] ?? 0) + 1
-  }
 
   const activePortal = portals.find((portal) => portal.slug === portalSlug)
   const visibleTasks = activePortal ? tasks.filter((task) => task.portal?.slug === portalSlug) : tasks
@@ -107,14 +72,11 @@ export default function TaskList({ isPublic = false, belowSearch = null }) {
 
   return (
     <section>
-      {/* Quick links: the most used tasks with short names, like "Important Links" on the UMS dashboard */}
       {quickLinks.length > 0 && (
         <div>
           <h2 className="flex items-center gap-2 text-lg font-bold">
             <Zap className="size-5 text-flame" aria-hidden="true" /> Quick links
           </h2>
-          {/* One row that scrolls sideways on phones, wrapped lines on bigger screens.
-              `relative` keeps the hidden screen-reader text inside the scrolling row. */}
           <ul className="no-scrollbar relative -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
             {quickLinks.map((task) => (
               <li key={task._id} className="shrink-0">
@@ -135,7 +97,6 @@ export default function TaskList({ isPublic = false, belowSearch = null }) {
         </div>
       )}
 
-      {/* Search + portal tabs */}
       <div className={`rounded-2xl border border-line bg-surface p-4 shadow-sm sm:p-5 ${quickLinks.length ? 'mt-6' : ''}`}>
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted" aria-hidden="true" />
@@ -164,12 +125,12 @@ export default function TaskList({ isPublic = false, belowSearch = null }) {
         </div>
 
         <div className="no-scrollbar -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label="Filter by portal">
-          <PortalTab label="All portals" count={tasks.length} active={!activePortal} onClick={() => choosePortal('all')} />
+          <PortalTab label="All portals" count={tasks.length} active={!activePortal} onClick={() => choosePortal('')} />
           {portals.map((portal) => (
             <PortalTab
               key={portal.slug}
               label={portal.name}
-              count={countByPortal[portal.slug] ?? 0}
+              count={countTasks(tasks, portal.slug)}
               active={activePortal?.slug === portal.slug}
               onClick={() => choosePortal(portal.slug)}
             />
@@ -177,7 +138,6 @@ export default function TaskList({ isPublic = false, belowSearch = null }) {
         </div>
       </div>
 
-      {/* The chosen portal, with a button to open it */}
       {activePortal && <PortalBanner portal={activePortal} />}
 
       {belowSearch && !query && !activePortal && <div className="mt-10">{belowSearch}</div>}
@@ -212,7 +172,6 @@ export default function TaskList({ isPublic = false, belowSearch = null }) {
       <div className={`mt-10 space-y-10 transition-opacity ${isSearching && !isFirstLoad ? 'opacity-60' : ''}`}>
         {groups.map((group) => (
           <TabCard key={group.category} title={group.category} icon={categoryIcon(group.category)} count={group.tasks.length}>
-            {/* Each section scrolls on its own, so a long category does not make the page long */}
             <ul className="scroll-area max-h-80 divide-y divide-line overflow-y-auto overscroll-contain rounded-b-2xl">
               {group.tasks.map((task) => (
                 <TaskCard key={task._id} task={task} isPublic={isPublic} />
@@ -225,7 +184,6 @@ export default function TaskList({ isPublic = false, belowSearch = null }) {
   )
 }
 
-// One portal tab: orange when chosen, white otherwise
 function PortalTab({ label, count, active, onClick }) {
   return (
     <button
@@ -242,7 +200,6 @@ function PortalTab({ label, count, active, onClick }) {
   )
 }
 
-// Dark banner (LPU Live colours) for the chosen portal
 function PortalBanner({ portal }) {
   return (
     <div className="mt-8 flex flex-col gap-5 rounded-2xl bg-navy p-5 sm:flex-row sm:items-center sm:p-6">
@@ -274,7 +231,6 @@ function PortalBanner({ portal }) {
   )
 }
 
-// Grey placeholder cards while the first answer is loading
 function LoadingCards() {
   return (
     <div className="mt-12 space-y-12" aria-label="Loading tasks">

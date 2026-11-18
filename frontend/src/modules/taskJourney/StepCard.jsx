@@ -1,12 +1,8 @@
 import { ArrowUpRight, Check, MapPin, TriangleAlert } from 'lucide-react'
 
-// One step of the guide: what to do, where to go, and a button to tick it.
-// `portalId` is the task's own portal: steps there only get an "Open" button,
-// steps somewhere else (an office) get a "Where" box explaining the place.
 export default function StepCard({ step, portalId, isDone, isCurrent, onToggle }) {
   const isOnTaskPortal = step.service && step.service._id === portalId
 
-  // A finished step is shown as one short line, so the page stays clean
   if (isDone) {
     return (
       <div className="flex items-center gap-4 rounded-2xl border border-leaf/20 bg-leaf-wash px-5 py-4">
@@ -56,7 +52,6 @@ export default function StepCard({ step, portalId, isDone, isCurrent, onToggle }
             </p>
           )}
 
-          {/* A step somewhere else: where the student goes, and what that place is */}
           {step.service && !isOnTaskPortal && (
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-paper px-4 py-3">
               <p className="flex items-start gap-2">
@@ -81,7 +76,6 @@ export default function StepCard({ step, portalId, isDone, isCurrent, onToggle }
           )}
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {/* A step on the task's own portal: just a button to open it, next to the tick button */}
             {isOnTaskPortal && step.openUrl && (
               <a
                 href={step.openUrl}

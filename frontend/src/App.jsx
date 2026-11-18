@@ -11,7 +11,6 @@ import JourneyPage from './modules/taskJourney/JourneyPage'
 import HelpPage from './modules/studentHelp/HelpPage'
 import { isLoggedIn } from './services/api'
 
-// Opening a new page starts at the top (the browser would otherwise keep the old scroll position)
 function ScrollToTop() {
   const { pathname } = useLocation()
   useEffect(() => {
@@ -20,8 +19,6 @@ function ScrollToTop() {
   return null
 }
 
-// Layout for every page after login: header + orange side menu + the current page (<Outlet />).
-// If the student is not logged in, send them to the login page instead.
 function LoggedInLayout() {
   if (!isLoggedIn()) return <Navigate to="/login" replace />
 
@@ -49,9 +46,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/login" element={<Login />} />
-        {/* Public: every task, without signing in */}
         <Route path="/explore" element={<Explore />} />
-
         <Route element={<LoggedInLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/portals" element={<Portals />} />
@@ -59,8 +54,6 @@ export default function App() {
           <Route path="/tasks/:taskId/journey" element={<JourneyPage />} />
           <Route path="/help" element={<HelpPage />} />
         </Route>
-
-        {/* Any unknown address goes back to the dashboard */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

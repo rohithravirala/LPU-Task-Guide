@@ -1,9 +1,6 @@
 import { Fragment } from 'react'
 import { ChevronRight } from 'lucide-react'
 
-// Where to click inside a portal: UMS › Academics › Examination System › Academic Result
-//  - default: one small line of text (task list)
-//  - large: separate chips (task details page)
 export default function MenuTrail({ portal, path = [], large = false }) {
   const parts = [portal?.name, ...path].filter(Boolean)
   if (parts.length < 2) return null

@@ -1,48 +1,30 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 
-// Dark form fields for the Sign in page (styled like LPU Live).
 const inputClass =
   'h-12 w-full rounded-lg border border-navy-line bg-navy-soft px-4 text-base text-white placeholder:text-fog/70 focus:border-flame focus:ring-2 focus:ring-flame/30 focus:outline-none'
 
-function Label({ htmlFor, label, optional }) {
-  return (
-    <label htmlFor={htmlFor} className="text-sm font-medium text-white">
-      {label}
-      {optional && <span className="font-normal text-fog"> (optional)</span>}
-    </label>
-  )
-}
-
-export function TextField({ id, label, hint, optional = false, ...inputProps }) {
+export function TextField({ id, label, ...inputProps }) {
   return (
     <div>
-      <Label htmlFor={id} label={label} optional={optional} />
-      <input id={id} aria-describedby={hint ? `${id}-hint` : undefined} className={`mt-2 ${inputClass}`} {...inputProps} />
-      {hint && (
-        <p id={`${id}-hint`} className="mt-1.5 text-sm text-fog">
-          {hint}
-        </p>
-      )}
+      <label htmlFor={id} className="text-sm font-medium text-white">
+        {label}
+      </label>
+      <input id={id} className={`mt-2 ${inputClass}`} {...inputProps} />
     </div>
   )
 }
 
-// Password input with a show / hide button (the eye icon, like on LPU Live)
-export function PasswordField({ id, label, hint, ...inputProps }) {
+export function PasswordField({ id, label, ...inputProps }) {
   const [visible, setVisible] = useState(false)
 
   return (
     <div>
-      <Label htmlFor={id} label={label} />
+      <label htmlFor={id} className="text-sm font-medium text-white">
+        {label}
+      </label>
       <div className="relative mt-2">
-        <input
-          id={id}
-          type={visible ? 'text' : 'password'}
-          aria-describedby={hint ? `${id}-hint` : undefined}
-          className={`${inputClass} pr-12`}
-          {...inputProps}
-        />
+        <input id={id} type={visible ? 'text' : 'password'} className={`${inputClass} pr-12`} {...inputProps} />
         <button
           type="button"
           onClick={() => setVisible(!visible)}
@@ -53,16 +35,10 @@ export function PasswordField({ id, label, hint, ...inputProps }) {
           {visible ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
         </button>
       </div>
-      {hint && (
-        <p id={`${id}-hint`} className="mt-1.5 text-sm text-fog">
-          {hint}
-        </p>
-      )}
     </div>
   )
 }
 
-// Error message shown above the form
 export function AuthError({ children }) {
   if (!children) return null
   return (

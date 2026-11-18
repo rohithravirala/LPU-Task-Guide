@@ -1,7 +1,6 @@
 import FAQ from './FAQ'
 import HelpGuidance from './HelpGuidance'
 
-// MODULE 3 – Student Guidance and Help
 export default function HelpPage() {
   return (
     <div>

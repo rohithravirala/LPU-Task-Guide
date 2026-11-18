@@ -7,12 +7,9 @@ const links = [
   { to: '/help', label: 'Help', icon: LifeBuoy },
 ]
 
-// Main navigation, like the orange UMS side menu: icon on top, name below.
-// A left column on laptops, a bar at the bottom of the screen on phones.
 export default function Sidebar() {
   const { pathname } = useLocation()
 
-  // "Tasks" stays highlighted on a task's own pages (/tasks/...)
   function isActive(to) {
     if (to === '/') return pathname === '/' || pathname.startsWith('/tasks')
     return pathname.startsWith(to)

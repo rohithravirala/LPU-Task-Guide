@@ -4,56 +4,41 @@ import { ArrowRight, ArrowUpRight, Search, Signpost } from 'lucide-react'
 import lpuSeal from '../assets/lpu-seal.svg'
 import PortalMark from './PortalMark'
 import { getTasks } from '../services/api'
+import { countTasks } from '../lib/portal'
 
-// What LPU Task Guide does, in three short points
 const whatItDoes = [
   { icon: Search, text: 'Find any LPU task in one search: attendance, fees, hostel leave, CodeTantra tests…' },
   { icon: Signpost, text: 'See exactly where to click, like UMS › Academics › View Attendance.' },
   { icon: ArrowUpRight, text: 'Open the right portal in one click, or follow the step-by-step guide.' },
 ]
 
-// Shown until the real numbers arrive (or if the server cannot be reached)
 const fallbackPortals = [
   { slug: 'ums', shortName: 'UMS', name: 'UMS' },
   { slug: 'lpu-live', shortName: 'Live', name: 'LPU Live' },
   { slug: 'codetantra', shortName: 'CT', name: 'CodeTantra' },
   { slug: 'neocolab', shortName: 'Neo', name: 'NeoColab' },
   { slug: 'lpu-touch', shortName: 'Touch', name: 'LPU Touch' },
-].map((portal) => ({ ...portal, count: 0 }))
+]
 
-// The connected portals and their task counts, from the public task list
-function usePortalOverview() {
+export default function AuthLayout({ title, subtitle, children }) {
   const [overview, setOverview] = useState({ total: 0, portals: fallbackPortals })
 
   useEffect(() => {
-    let ignore = false
     getTasks()
       .then(({ tasks, portals }) => {
-        if (ignore) return
         setOverview({
           total: tasks.length,
-          portals: portals.map((portal) => ({ ...portal, count: tasks.filter((task) => task.portal?.slug === portal.slug).length })),
+          portals: portals.map((portal) => ({ ...portal, count: countTasks(tasks, portal.slug) })),
         })
       })
-      .catch(() => {}) // keep the fallback list
-    return () => {
-      ignore = true
-    }
+      .catch(() => {})
   }, [])
 
-  return overview
-}
-
-// Layout of the Sign in page, in the style of the LPU Live sign-in page:
-// one big rounded card, warm dark gradient on the left (what the app does),
-// the form on a black panel on the right.
-export default function AuthLayout({ title, subtitle, children }) {
-  const { total, portals } = usePortalOverview()
+  const { total, portals } = overview
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-navy sm:p-6 lg:p-10">
       <div className="grid min-h-screen w-full max-w-6xl overflow-hidden bg-night sm:min-h-[min(780px,calc(100vh-3rem))] sm:rounded-[28px] sm:shadow-2xl sm:shadow-black/40 lg:grid-cols-[1.08fr_1fr]">
-        {/* Left side: what the app does and which portals it connects (hidden on phones) */}
         <section
           className="relative hidden flex-col justify-between gap-8 p-10 lg:flex xl:p-12"
           style={{ background: 'linear-gradient(165deg, var(--color-ember-deep) 8%, #2f1107 55%, var(--color-ember) 100%)' }}
@@ -103,7 +88,6 @@ export default function AuthLayout({ title, subtitle, children }) {
           <p className="text-sm text-white/60">A student guidance project. Not an official LPU website.</p>
         </section>
 
-        {/* Right side: the form */}
         <main className="flex items-center justify-center px-6 py-12 sm:px-12">
           <div className="w-full max-w-md">
             <div className="mb-10 flex items-center gap-3 lg:hidden">
@@ -114,7 +98,6 @@ export default function AuthLayout({ title, subtitle, children }) {
             <p className="mt-3 text-lg text-fog">{subtitle}</p>
             {children}
 
-            {/* Phones do not see the left side, so explain and link the task list here */}
             <div className="mt-10 rounded-xl border border-navy-line p-4 lg:hidden">
               <p className="text-sm text-fog">
                 LPU Task Guide puts every task from {portals.map((portal) => portal.name).join(', ')} in one place and opens the

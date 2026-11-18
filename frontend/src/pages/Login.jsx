@@ -6,26 +6,22 @@ import { AuthError, PasswordField, TextField } from '../components/AuthInput'
 import { safeNextPath } from '../lib/navigation'
 import { getErrorMessage, isLoggedIn, login, loginAsDemo, saveSession } from '../services/api'
 
-// Sign in. There is no sign-up: accounts are given out by the project team.
-// "Try demo" signs in as the demo account in one click, for testing.
 export default function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const next = safeNextPath(searchParams.get('next')) // page to open after signing in
+  const next = safeNextPath(searchParams.get('next'))
   const [registrationNumber, setRegistrationNumber] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState('') // '' | 'password' | 'demo': which button is working
+  const [busy, setBusy] = useState('')
 
-  // Already logged in? Go straight on.
   if (isLoggedIn()) return <Navigate to={next} replace />
 
-  // Both buttons do the same thing with the answer: keep the session and go on
   async function signIn(kind, request) {
     setError('')
     setBusy(kind)
     try {
-      saveSession(await request()) // keep the token + student details in the browser
+      saveSession(await request())
       navigate(next)
     } catch (err) {
       setError(getErrorMessage(err))
@@ -34,7 +30,7 @@ export default function Login() {
   }
 
   function handleSubmit(event) {
-    event.preventDefault() // stop the browser from reloading the page
+    event.preventDefault()
     signIn('password', () => login(registrationNumber, password))
   }
 
@@ -74,7 +70,6 @@ export default function Login() {
             {busy === 'password' ? 'Signing in…' : 'Sign in'}
             {busy !== 'password' && <ArrowRight className="size-5" aria-hidden="true" />}
           </button>
-          {/* Not a form submit: works without typing anything */}
           <button
             type="button"
             onClick={() => signIn('demo', loginAsDemo)}

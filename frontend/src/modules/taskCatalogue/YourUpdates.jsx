@@ -12,51 +12,39 @@ const kindStyles = {
   update: { label: 'Update', className: 'bg-blue-wash text-blue-deep' },
 }
 
-// "Due in 2 days · Mon, 16 Nov"
 function dueText(update) {
   if (update.dueInDays == null) return ''
   const when = update.dueInDays === 0 ? 'today' : update.dueInDays === 1 ? 'tomorrow' : `in ${update.dueInDays} days`
   return `Due ${when} · ${format(new Date(update.dueDate), 'EEE, d MMM')}`
 }
 
-// "Your updates": shown right under the search box on the dashboard, like "My Messages" on the
-// UMS dashboard. Deadlines and messages from every portal as small cards, each linked to its task.
-// SAMPLE data from the backend (LPU has no public API to get a student's real updates).
 export default function YourUpdates() {
-  const [state, setState] = useState({ status: 'loading', updates: [], error: '' })
+  const [updates, setUpdates] = useState(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    let ignore = false
     getUpdates()
-      .then((data) => {
-        if (!ignore) setState({ status: 'ready', updates: data.updates, error: '' })
-      })
-      .catch((err) => {
-        if (!ignore) setState({ status: 'error', updates: [], error: getErrorMessage(err) })
-      })
-    return () => {
-      ignore = true
-    }
+      .then((data) => setUpdates(data.updates))
+      .catch((err) => setError(getErrorMessage(err)))
   }, [])
 
   return (
     <TabCard
       title="Your updates"
       icon={Bell}
-      count={state.status === 'ready' ? state.updates.length : undefined}
+      count={updates?.length}
       action={
         <span className="rounded-full border border-saffron/60 bg-surface px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-flame-deep">
           SAMPLE
         </span>
       }
     >
-      {state.status === 'loading' && <p className="px-4 pb-4 text-sm text-muted">Loading…</p>}
-      {state.status === 'error' && <p role="alert" className="px-4 pb-4 text-sm text-danger">{state.error}</p>}
+      {!updates && !error && <p className="px-4 pb-4 text-sm text-muted">Loading…</p>}
+      {error && <p role="alert" className="px-4 pb-4 text-sm text-danger">{error}</p>}
 
-      {state.status === 'ready' && (
-        // Cards side by side (3 on laptops, 2 on tablets, 1 on phones); the area scrolls on its own
+      {updates && (
         <ul className="scroll-area grid max-h-[360px] gap-3 overflow-y-auto overscroll-contain px-4 pb-4 sm:grid-cols-2 xl:grid-cols-3">
-          {state.updates.map((update) => {
+          {updates.map((update) => {
             const kind = kindStyles[update.kind] ?? kindStyles.update
             const { task } = update
             return (
